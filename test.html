@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/utils/utils.js"></script>
+    <script src="js/utils/eventBus.js"></script>
+    <script src="concepts/concepts/actions.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+
+
+
+<!-- СКРИПТЫ (Порядок загрузки критически важен) -->
+
+<!-- 1. Утилиты и Константы -->
+<script src="js/utils/utils.js"></script>
+<script src="js/utils/event_strings.js"></script> <!-- Убедись, что тут есть EVENTS -->
+<script src="js/rpg/assets_string.js"></script>
+
+<!-- 2. Конфигурации -->
+<script src="js/rpg/graphics_config.js"></script>
+<script src="./js/rpg/gameData.js"></script> <!-- Герои и Враги -->
+<script src="./js/rpg/dbSpells.js"></script>  <!-- База заклинаний -->
+
+<!-- 3. Системные классы -->
+<script src="js/utils/eventBus.js"></script>
+<script src="js/utils/inputHandler.js"></script>
+<script src="./js/rpg/unit.js"></script>
+
+<!-- 4. Менеджеры (Базовые) -->
+<script src="./js/rpg/resourceManager.js"></script>
+<script src="./js/rpg/assetsManager.js"></script>
+<script src="./js/managers/uiManager.js"></script>
+<script src="./js/managers/animationManager.js"></script>
+
+<!-- 5. Тетрис Логика -->
+<script src="js/tetris/grid.js"></script>
+<script src="js/tetris/pieceFactory.js"></script>
+<script src="./js/renderers/renderer.js"></script>
+
+<!-- 6. RPG Логика (Билдер должен быть ДО BattleManager) -->
+<script src="./js/rpg/battleRenderer.js"></script>
+<script src="./js/rpg/castableSpell.js"></script>
+<script src="./js/rpg/spellBuilder.js"></script> <!-- Исправил SpellBilder на SpellBuilder -->
+<script src="./js/rpg/battleManager.js"></script>
+
+<!-- 7. Инициализация -->
+<script src="js/tetris/game.js"></script>
+<script src="./js/main.js"></script>
+
+
+
+Огненный шар Сила:10 Эффект: (айди:BURN Название:Горение Тип:DEBUFF Цель:ENEMY Длительность:3 Сила:2 ) Цена:T:5, MP:10, I:30, Z:10,
+
+Название: Огненный шар.
+Сила 10.
+Эффект: Горение.
+Сила:2
+Длительность: 2.
+Итого: T-5, MP-10, I-30, Z-10

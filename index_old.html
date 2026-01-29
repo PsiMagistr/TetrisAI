@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris RPG Battle</title>
+
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" href="./css/style.css">
+
+    <!-- Шрифты (Pixel Art стиль) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="main-container">
+    <div id="tetris-wrapper" class="tetris-wrapper">
+        <!-- Игровое поле -->
+        <canvas id="game-board" width="309" height="619"></canvas>
+
+        <!-- Боковая панель -->
+        <aside class="side-panel">
+            <h1>ТЕТРИС</h1>
+
+            <div class="info-box">
+                <span class="info-title">СЧЁТ</span>
+                <p id="score">0</p>
+            </div>
+
+            <div class="info-box">
+                <span class="info-title">ЛИНИИ</span>
+                <p id="lines">0</p>
+            </div>
+
+            <div class="info-box">
+                <span class="info-title">УРОВЕНЬ</span>
+                <p id="level">1</p>
+            </div>
+
+            <!-- Превью следующей фигуры -->
+            <div class="info-box next-piece-container">
+                <span class="info-title">СЛЕДУЮЩАЯ</span>
+                <canvas id="next-piece-board" width="185" height="185"></canvas>
+            </div>
+
+            <!-- Кнопка старта (для начала игры вручную) -->
+            <button id="start-button" class="game-button">СТАРТ</button>
+        </aside>
+
+        <!-- Панель ресурсов (Скрыта до начала игры) -->
+        <aside class="side-panel hidden" id="resources-container">
+            <div class="info-box">
+                <span class="info-title">РЕСУРСЫ</span>
+                <!-- JS будет добавлять сюда div'ы -->
+                <div id="main-resources-panel" class="info-box test"></div>
+            </div>
+        </aside>
+    </div> <!-- Конец tetris-wrapper -->
+
+
+    <!-- СЛОЙ ПОВЕРХ ИГРЫ (OVERLAY) -->
+    <div id="game-overlay" class="hidden">
+
+        <!-- 1. ОКНО ЗАГРУЗКИ (Loader) -->
+        <!-- Появляется, когда BattleManager ждет загрузку ассетов -->
+        <div id="loading-modal" class="hidden">
+            <div class="loader-container">
+                <div class="pixel-spinner"></div>
+                <div class="pixel-spinner-shadow"></div>
+            </div>
+            <p class="loading-text">ЗАГРУЗКА<span class="dots">...</span></p>
+        </div>
+
+        <!-- 2. ГЛАВНОЕ МЕНЮ / GAME OVER -->
+        <div id="game-menu" class="hidden">
+            <h2 id="modal-title">ТЕТРИС RPG</h2>
+            <p id="modal-text">Собери линии, чтобы накопить ману!</p>
+            <button id="modal-button" class="game-button">ИГРАТЬ</button>
+        </div>
+
+        <!-- 3. БИТВА (RPG) -->
+        <div id="battle-modal" class="hidden">
+
+            <!-- Шапка: Статистика уровня -->
+            <div class="battle-header">
+                <h3>СТАТИСТИКА</h3>
+                <div id="statistics-container">
+                    <span id="statistics"></span>
+                </div>
+            </div>
+
+            <!-- Арена: Канвас с героями -->
+            <div class="battle-arena">
+                <canvas id="battle-canvas"></canvas>
+            </div>
+
+            <div class="battle-controls-panel">
+                <!-- Кнопка слабой атаки -->
+                <button id="btn-basic-attack" class="game-button action-btn">
+                    ⚔️ Топнуть (Атака)
+                </button>
+
+                <!-- Кнопка сдачи -->
+                <button id="btn-surrender" class="game-button escape-btn">
+                    🏳️ Сдаться
+                </button>
+            </div>
+
+            <!-- Лог боя -->
+            <div id="battle-log" class="battle-log">
+                <div class="log-entry system">> Битва началась!</div>
+            </div>
+
+            <!-- UI: КОНСТРУКТОР ЗАКЛИНАНИЙ -->
+            <div class="battle-ui-constructor">
+
+                <!-- ВЕРХНИЙ РЯД: Инфо + Модификаторы (ВМЕСТЕ) -->
+                <div class="spell-maker-header">
+
+                    <!-- А. Предпросмотр (Слева) -->
+                    <div id="spell-preview-box" class="preview-box compact">
+                        <div class="preview-main-info">
+                            <span id="preview-text">ВЫБЕРИТЕ ЗАКЛИНАНИЕ</span>
+                        </div>
+                        <!-- Цена выводится сюда -->
+                        <span id="preview-cost" class="preview-cost hidden"></span>
+                    </div>
+                    <!-- Б. Панель модификаторов (Справа) -->
+                    <div id="modifiers-panel" class="modifiers-panel compact">
+                        <!-- Кнопки J, I, Z, S будут создаваться здесь через JS -->
+                        <button class="mod-btn active" title="Масштаб">
+                            J <span class="badge" style="display: block;">x2</span>
+                        </button>
+
+                        <!-- Кнопка I: Не активна -->
+                        <button class="mod-btn" title="Длительность">
+                            I <span class="badge">x0</span>
+                        </button>
+
+                        <!-- Кнопка Z: Активна (Включена) -->
+                        <button class="mod-btn active" title="Дебафф">
+                            Z
+                        </button>
+
+                        <!-- Кнопка S: Не активна -->
+                        <button class="mod-btn" title="Бафф">
+                            S
+                        </button>
+                    </div>
+                </div>
+                <!-- В. Нижняя панель (Список + Каст) -->
+                <div class="footer-actions vertical-layout">
+                    <!-- Список заклинаний -->
+                    <div class="spells-grid-container" id="spells-container">
+                        <!-- Кнопки генерируются JS -->
+                    </div>
+
+                    <!-- Кнопка КАСТ -->
+                    <div class="cast-wrapper-vertical">
+                        <button id="cast-btn" class="cast-btn"> <!--hidden-->
+                            ПРИМЕНИТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Конец UI конструктора -->
+
+        </div> <!-- Конец battle-modal -->
+
+    </div> <!-- Конец game-overlay -->
+
+</div>
+
+<!-- СКРИПТЫ (Порядок важен!) -->
+<script src="js/utils/utils.js"></script>
+<script src="js/utils/event_strings.js"></script>
+<script src="js/rpg/assets_string.js"></script>
+<script src="js/rpg/graphics_config.js"></script>
+<script src="./js/rpg/gameData.js"></script>
+<script src="js/utils/eventBus.js"></script>
+<script src="./js/rpg/unit.js"></script>
+<script src="js/utils/inputHandler.js"></script>
+<script src="js/managers/uiManager.js"></script>
+<script src="js/tetris/grid.js"></script>
+<script src="js/tetris/pieceFactory.js"></script>
+<script src="js/renderers/renderer.js"></script>
+<script src="js/rpg/battleRenderer.js"></script>
+<script src="js/managers/animationManager.js"></script>
+<script src="js/rpg/resourceManager.js"></script>
+<script src="js/rpg/assetsManager.js"></script>
+<script src="./js/rpg/dbSpells.js"></script>
+<script src="./js/rpg/castableSpell.js"></script>
+<script src="js/rpg/spellBuilder.js"></script>
+<script src="js/rpg/battleManager.js"></script>
+<script src="js/tetris/game.js"></script>
+<script src="./js/main.js"></script>
+
+</body>
+</html>
+

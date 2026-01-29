@@ -1,0 +1,89 @@
+Реализация на Canvas (Код для BattleRenderer)
+
+Добавь этот код в свой BattleRenderer. Он рисует красивые светящиеся бары.
+    code JavaScript
+
+
+// В начале файла добавь маппинг цветов (стандартные цвета тетриса)
+const RESOURCE_COLORS = {
+    T: "#A000F0", // Purple
+    L: "#F0A000", // Orange
+    J: "#0000F0", // Blue
+    I: "#00F0F0", // Cyan
+    Z: "#F00000", // Red
+    S: "#00F000", // Green
+    O: "#F0F000"  // Yellow
+};
+
+// В классе BattleRenderer
+drawResourcesBars(ctx, resources, x, y, width, height) {
+    const keys = Object.keys(resources);
+    const barWidth = width / keys.length;
+    const gap = 5;
+    const maxVal = 100; // Допустим, 100 - это полный бар
+
+    keys.forEach((key, index) => {
+        const res = resources[key];
+        const color = RESOURCE_COLORS[key] || "#FFF";
+        const val = Math.min(res.value, maxVal); // Защита от переполнения
+
+        const bx = x + index * barWidth;
+        const by = y;
+        const bW = barWidth - gap;
+        const bH = height;
+
+        // 1. Фон бара (темный)
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(bx, by, bW, bH);
+
+        // 2. Заполнение (цветное)
+        // Считаем высоту заполнения
+        const fillHeight = (val / maxVal) * bH;
+        const fillY = by + bH - fillHeight;
+
+        ctx.save();
+        // Добавляем свечение (Glow effect)
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = color;
+        ctx.fillStyle = color;
+
+        ctx.fillRect(bx, fillY, bW, fillHeight);
+        ctx.restore();
+
+        // 3. Рамка
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(bx, by, bW, bH);
+
+        // 4. Текст/Иконка снизу
+        ctx.fillStyle = "#FFF";
+        ctx.font = "10px Press Start 2P"; // Или твой шрифт
+        ctx.textAlign = "center";
+        ctx.fillText(key, bx + bW / 2, by + bH + 15);
+
+        // Цифровое значение (опционально)
+        ctx.font = "8px Arial";
+        ctx.fillText(Math.floor(val), bx + bW / 2, by + bH - 5);
+    });
+}
+
+// В методе draw(state)
+draw(state) {
+    this.clear();
+    // ... отрисовка фона и героев ...
+
+    // Рисуем панель ресурсов внизу по центру
+    // Например: отступ 50 от края, внизу экрана
+    if (state.player && state.player.resources) {
+        this.drawResourcesBars(
+            this.ctx,
+            state.player.resources,
+            50,               // X
+            this.canvas.height - 80, // Y
+            this.canvas.width - 100, // Ширина всей панели
+            60                // Высота баров
+        );
+    }
+}
+
+  

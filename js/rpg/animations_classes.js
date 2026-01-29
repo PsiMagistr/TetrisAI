@@ -1,0 +1,226 @@
+class AnimationContainer{
+    constructor(animChain){
+        this.animaChain = animChain;
+        this.isDeleted = false;
+        this.active = null;
+    }
+    move(){
+        if(this.animaChain.length == 0) return;
+        this.active = this.animaChain[0];
+        this.active.move();
+        if(this.active.isDeleted){
+            this.animaChain.shift();
+        }
+        if(this.animaChain.length == 0){
+            console.log("Удаление")
+            this.isDeleted = true;
+        }
+    }
+}
+
+class AnimationSpellFactory{
+    constructor() {
+    }
+    createSpellAnimation(caster, target, configChain, callback){
+        const defSize = GRAPHICS_CONFIG.units.defaultSize;
+        const centers = {
+            caster:{
+                x:caster.avatar.x + (caster.avatar.width || defSize) / 2,
+                y:caster.avatar.y + (caster.avatar.width || defSize) / 2,
+            },
+            target:{
+                x:target.avatar.x + (target.avatar.width || defSize) / 2,
+                y:target.avatar.y + (target.avatar.width || defSize) / 2,
+            },
+        }
+        const chain = [];
+        const animationList = {
+            jerk:Jerk,
+            fireball:Fireball,
+        }
+        for(let link of configChain){
+            const params = {...link};
+            const keys = ["speed", "distance", "callback"];
+            keys.forEach((key)=>{
+                if(key == "speed" || key == "distance"){
+                    params[key] = centers.caster.x < centers.target.x ? Math.abs(params[key]) : -Math.abs(params[key]);
+                }
+                else if(key == "callback"){
+                    params.callback = callback;
+                }
+            })
+            const size = params.size || 0;
+            const startPoint = params.startFrom === "target"?centers.target:centers.caster;
+            params.x = startPoint.x - (size / 2);
+            params.y = startPoint.y - (size / 2);
+            params.targetX = centers.target.x;
+            params.caster = caster;
+            params.target = target;
+            const AnimationClass = animationList[params.type];
+            console.log("Параметры центровки");
+            console.log(params);
+            if (AnimationClass) {
+                chain.push(new AnimationClass(params));
+            } else {
+                throw new Error(`AnimationSpellFactory: Класс анимации "${params.type}" не найден.`);
+            }
+
+        }
+        return new AnimationContainer(chain)
+    }
+}
+
+
+
+
+class Fireball{
+    constructor({x,y,speed,size,color,targetX,callback}){
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.size = size;
+        this.color = color;
+        this.targetX = targetX,
+        this.fn = callback;
+        this.isDeleted = false;
+    }
+    isCollision(){
+        if(this.speed > 0){
+            if(this.x >= this.targetX){
+                this.isDeleted = true;
+                return  this.isDeleted;
+            }
+        }
+        if(this.speed < 0){
+            if(this.x <= this.targetX){
+                this.isDeleted = true;
+                return  this.isDeleted;
+            }
+        }
+
+    }
+    move(){
+        this.x += this.speed;
+        if(this.isCollision()){
+            this.fn();
+        }
+    }
+    draw(ctx){
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+    }
+}
+
+/*class Jerk {
+    constructor({ caster, distance = 30, duration = 300 }) {
+        this.caster = caster;
+        // Запоминаем исходную позицию, чтобы точно вернуться в неё
+        this.startX = this.caster.avatar.x;
+
+        // На сколько пикселей сдвинуться (для врага можно передавать отрицательное число)
+        this.distance = distance;
+
+        // Сколько миллисекунд длится рывок
+        this.duration = duration;
+
+        // Счетчик прошедшего времени
+        this.elapsedTime = 0;
+
+        this.isDeleted = false;
+    }
+
+    move(deltaTime) { // deltaTime - время с последнего кадра в мс (обычно ~16)
+        if (this.isDeleted) return;
+
+        // 1. Накапливаем время
+        // (Если deltaTime не пришел, берем 16ms как заглушку для 60fps)
+        this.elapsedTime += (deltaTime || 16);
+
+        // 2. Считаем прогресс от 0.0 до 1.0
+        const progress = this.elapsedTime / this.duration;
+
+        // 3. Если время вышло — завершаем
+        if (progress >= 1) {
+            // ВАЖНО: Принудительно возвращаем в старт, чтобы избежать "уползания" координат
+            this.caster.avatar.x = this.startX;
+            this.isDeleted = true;
+            return;
+        }
+
+        // 4. Вычисляем смещение (Интерполяция)
+        // Math.sin(progress * Math.PI) создает идеальную дугу:
+        // При 0.0 -> sin(0) = 0
+        // При 0.5 -> sin(PI/2) = 1 (Пик рывка)
+        // При 1.0 -> sin(PI) = 0 (Возврат)
+        const offset = Math.sin(progress * Math.PI) * this.distance;
+
+        // 5. Применяем координату
+        this.caster.avatar.x = this.startX + offset;
+    }
+}*/
+
+
+class Jerk {
+    constructor({ caster, distance = 30, duration = 300 }) {
+        this.caster = caster;
+        // Запоминаем старт
+        this.startX = this.caster.avatar.x;
+        // Дистанция рывка (положительная или отрицательная)
+        this.distance = distance;
+        this.duration = duration;
+        this.elapsedTime = 0;
+        this.isDeleted = false;
+
+        // НАСТРОЙКИ ЗАМАХА
+        this.backswingRatio = 0.3; // 30% времени тратим на замах
+        this.backswingForce = 0.3; // Откатываемся на 30% от силы удара
+    }
+
+    move(deltaTime) {
+        if (this.isDeleted) return;
+
+        // 1. Накапливаем время
+        this.elapsedTime += (deltaTime || 16);
+        const progress = this.elapsedTime / this.duration;
+
+        // 2. Финиш
+        if (progress >= 1) {
+            this.caster.avatar.x = this.startX; // Жесткий сброс в ноль
+            this.isDeleted = true;
+            return;
+        }
+
+        let offset = 0;
+        // Величина отката в пикселях (например, 10px назад)
+        const backDist = this.distance * this.backswingForce;
+
+        // --- ФАЗА 1: ЗАМАХ (Откат назад) ---
+        if (progress < this.backswingRatio) {
+            // Нормализуем прогресс внутри этой фазы (от 0.0 до 1.0)
+            const phaseP = progress / this.backswingRatio;
+
+            // Двигаемся от 0 до -backDist
+            // Используем половинку синуса для плавного разгона назад
+            offset = -backDist * Math.sin(phaseP * Math.PI / 2);
+        }
+
+        // --- ФАЗА 2: УДАР (Выпад вперед и возврат) ---
+        else {
+            // Нормализуем прогресс для второй фазы (от 0.0 до 1.0)
+            const phaseP = (progress - this.backswingRatio) / (1 - this.backswingRatio);
+
+            // 1. Основная волна удара (0 -> Максимум -> 0)
+            const attackWave = Math.sin(phaseP * Math.PI) * this.distance;
+
+            // 2. Плавное гашение отката (чтобы не было скачка)
+            // Мы начинаем с позиции -backDist и линейно идем к 0
+            const recovery = -backDist * (1 - phaseP);
+
+            // Складываем волну удара и затухающий откат
+            offset = attackWave + recovery;
+        }
+
+        // 3. Применяем
+        this.caster.avatar.x = this.startX + offset;
+    }
+}

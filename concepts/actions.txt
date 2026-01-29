@@ -1,0 +1,51 @@
+window.addEventListener("load", () => {
+    const eventBus = new EventBus();
+    class Test extends  Subscriber{
+        constructor(eventBus, name){
+            super(eventBus);
+            this.name = name;
+            this.setupSubscribers();
+            this.message = "Elena";
+        }
+        start(){
+            console.log("Событие init произошло! " + this.name);
+            this.message = "Marina";
+            this.loop();
+        }
+
+        loop(){
+            this.eventBus.emit("render", {message: this.message});
+            this.eventBus.emit("print", {message: this.message});
+        }
+
+        print(){
+            console.log(this.message);
+        }
+
+        setupSubscribers(){
+            this.eventOn("print", this.print.bind(this));
+            this.eventOn("init", this.start.bind(this));
+        }
+
+    }
+
+
+    let test;
+    function Init(){
+        if(test){
+            test.dispose();
+        }
+        test = new Test(eventBus, "Second");
+        console.log("function init called");
+    }
+    function render({message}){
+        console.log("render " + message)
+    }
+    eventBus.on("init", Init);
+    eventBus.on("render", render);
+    test = new Test(eventBus, "First");
+
+    document.addEventListener("keydown", ()=>{
+        eventBus.emit("init", {});
+    })
+})

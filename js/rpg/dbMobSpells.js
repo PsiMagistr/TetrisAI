@@ -1,0 +1,43 @@
+const MOB_SPELLS_DATABASE = {
+    HEAVY_BLOW:{
+        id:"HEAVY_BLOW",
+        name:"Тяжелый удар",
+        type:"ATTACK",
+        baseCost:{MP:50},
+        basePower:10,
+        animationChain:[
+            {
+                type:"jerk",
+                startFrom:"caster",
+                distance:30,
+                duration:300,
+                caster:null,
+            },
+            {
+                type:"fireball",
+                startFrom:"caster",
+                casterX: 0,
+                casterY:0,
+                speed:15,
+                size:10,
+                color:"#e74c3c",
+                targetX:0,
+                callback:null,
+            },
+        ],
+        modifiers:{
+            J:{
+                enabled:false,
+            },
+            I:{
+                enabled:false,
+            },
+            Z:{
+                enabled:false,
+            },
+            S:{
+                enabled:false,
+            }
+        }
+    },
+}
