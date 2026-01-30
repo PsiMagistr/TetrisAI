@@ -24,6 +24,10 @@ const MOB_SPELLS_DATABASE = {
                 targetX:0,
                 callback:null,
             },
+            {
+                type:"flashEffect",
+                callback: null,
+            }
         ],
         modifiers:{
             J:{

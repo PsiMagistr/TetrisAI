@@ -4,15 +4,14 @@ class AnimationContainer{
         this.isDeleted = false;
         this.active = null;
     }
-    move(){
+    move(deltaTime){
         if(this.animaChain.length == 0) return;
         this.active = this.animaChain[0];
-        this.active.move();
+        this.active.move(deltaTime);
         if(this.active.isDeleted){
             this.animaChain.shift();
         }
         if(this.animaChain.length == 0){
-            console.log("Удаление")
             this.isDeleted = true;
         }
     }
@@ -37,6 +36,7 @@ class AnimationSpellFactory{
         const animationList = {
             jerk:Jerk,
             fireball:Fireball,
+            flashEffect:FlashEffect,
         }
         for(let link of configChain){
             const params = {...link};
@@ -219,8 +219,63 @@ class Jerk {
             // Складываем волну удара и затухающий откат
             offset = attackWave + recovery;
         }
-
         // 3. Применяем
         this.caster.avatar.x = this.startX + offset;
+    }
+
+}
+
+class FlashEffect {
+    constructor({ target, duration = 700, callback }) {
+        this.target = target;       // Объект Юнита (Hero или Enemy)
+        this.duration = duration;   // Длительность вспышки (мс)
+        this.callback = callback;   // Функция onHit (нанесение урона)
+
+        this.elapsedTime = 0;
+        this.isDeleted = false;
+    }
+
+    move(deltaTime) {
+        if (this.isDeleted) return;
+
+        // 1. Накапливаем время
+        this.elapsedTime += (deltaTime || 16);
+
+        // 2. Считаем прогресс (от 0.0 до 1.0)
+        const progress = this.elapsedTime / this.duration;
+
+        // 3. Проверка окончания
+        if (progress >= 1) {
+            this._finish();
+            return;
+        }
+
+        // 4. Математика мигания (Синусоида)
+        // Math.sin(0..PI) дает дугу: 0 -> 1 -> 0
+        const flashIntensity = Math.sin(progress * Math.PI);
+
+        // Прозрачность: 1.0 -> 0.2 -> 1.0
+        // (Мы не уходим в 0, чтобы персонаж не исчез полностью)
+        const newOpacity = 1 - (flashIntensity * 0.8);
+
+        // Применяем к аватару юнита
+        if (this.target && this.target.avatar) {
+            this.target.avatar.opacity = newOpacity;
+        }
+    }
+
+    _finish() {
+        // 1. Жесткий сброс прозрачности (чтобы не застрял полупрозрачным)
+        if (this.target && this.target.avatar) {
+            this.target.avatar.opacity = 1;
+        }
+
+        // 2. Вызываем боевую логику (Урон)
+        /*if (this.callback) {
+            this.callback();
+        }*/
+
+        // 3. Удаляем эффект
+        this.isDeleted = true;
     }
 }

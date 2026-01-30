@@ -24,7 +24,11 @@ const SPELLS_DATABASE = {
                 color:"#e74c3c",
                 targetX:0,
                 callback:null,
-            }
+            },
+            {
+                type:"flashEffect",
+                callback: null,
+            },
         ],
         modifiers:{
             J:{//Масштаб

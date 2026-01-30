@@ -46,7 +46,10 @@ class BattleRenderer extends Subscriber{
         this.ctx.fillStyle = this.config.ui.fonts.color;
         this.ctx.textAlign = "center";
         this.ctx.fillText(`${unit.name}`, textCenterX, textY);
+        this.ctx.save();
+        this.ctx.globalAlpha = unit.avatar.opacity ?? 1;
         this.ctx.drawImage(unit.avatar.sprite, unit.avatar.x, unit.avatar.y, spriteW, spriteH);
+        this.ctx.restore();
         this.ctx.strokeStyle = "red";
         this.ctx.strokeRect(unit.avatar.x, unit.avatar.y, spriteW, spriteH);
         this.drawBar(hpX, hpY, unit.maxHp, unit.currentHp, hpBarWidth, this.config.ui.hpBar);

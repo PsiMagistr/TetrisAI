@@ -268,8 +268,6 @@ class BattleManager extends Subscriber{
     update(deltaTime){
         const animations = this.battleState.animations;
         for(const animation of animations){
-            console.log("Анимации")
-            console.log(animation.active);
             animation.move(deltaTime);
         }
         this.battleState.animations = animations.filter(anim => !anim.isDeleted);
