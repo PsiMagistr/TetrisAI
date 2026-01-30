@@ -3,7 +3,7 @@ const MOB_SPELLS_DATABASE = {
         id:"HEAVY_BLOW",
         name:"Тяжелый удар",
         type:"ATTACK",
-        baseCost:{MP:50},
+        baseCost:{MP:5},
         basePower:10,
         animationChain:[
             {
@@ -26,6 +26,7 @@ const MOB_SPELLS_DATABASE = {
             },
             {
                 type:"flashEffect",
+                duration: 7000,
                 callback: null,
             }
         ],

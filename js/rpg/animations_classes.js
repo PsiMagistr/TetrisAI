@@ -102,7 +102,7 @@ class Fireball{
     move(){
         this.x += this.speed;
         if(this.isCollision()){
-            this.fn();
+            //this.fn();
         }
     }
     draw(ctx){
@@ -271,9 +271,9 @@ class FlashEffect {
         }
 
         // 2. Вызываем боевую логику (Урон)
-        /*if (this.callback) {
+        if (this.callback) {
             this.callback();
-        }*/
+        }
 
         // 3. Удаляем эффект
         this.isDeleted = true;
