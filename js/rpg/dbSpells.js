@@ -29,6 +29,7 @@ const SPELLS_DATABASE = {
                 type:"flashEffect",
                 callback: null,
                 duration: 800,
+                isUseCallback:true,
             },
         ],
         modifiers:{

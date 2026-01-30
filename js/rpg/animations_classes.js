@@ -74,7 +74,7 @@ class AnimationSpellFactory{
 
 
 class Fireball{
-    constructor({x,y,speed,size,color,targetX,callback}){
+    constructor({x,y,speed,size,color,targetX,callback, isUseCallback}){
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -83,6 +83,7 @@ class Fireball{
         this.targetX = targetX,
         this.fn = callback;
         this.isDeleted = false;
+        this.isUseCallback = isUseCallback;
     }
     isCollision(){
         if(this.speed > 0){
@@ -101,8 +102,9 @@ class Fireball{
     }
     move(){
         this.x += this.speed;
-        if(this.isCollision()){
-            //this.fn();
+        const useCallback = this.useCallback || false;
+        if(this.isCollision() && this.isUseCallback){
+             this.fn();
         }
     }
     draw(ctx){
@@ -226,11 +228,11 @@ class Jerk {
 }
 
 class FlashEffect {
-    constructor({ target, duration = 700, callback }) {
+    constructor({ target, duration = 700, callback, isUseCallback }) {
         this.target = target;       // Объект Юнита (Hero или Enemy)
         this.duration = duration;   // Длительность вспышки (мс)
         this.callback = callback;   // Функция onHit (нанесение урона)
-
+        this.isUseCallback = isUseCallback;
         this.elapsedTime = 0;
         this.isDeleted = false;
     }
@@ -271,10 +273,9 @@ class FlashEffect {
         }
 
         // 2. Вызываем боевую логику (Урон)
-        if (this.callback) {
+        if (this.callback && this.isUseCallback) {
             this.callback();
         }
-
         // 3. Удаляем эффект
         this.isDeleted = true;
     }
