@@ -7,7 +7,7 @@ const SPELLS_DATABASE = {
         basePower:10,
         icon:"./assets/spells/icons/fireball.png",
         animationChain:[
-            {
+            /*{
                 type:"jerk",
                 startFrom:"caster",
                 distance:30,
@@ -30,7 +30,16 @@ const SPELLS_DATABASE = {
                 callback: null,
                 duration: 800,
                 isUseCallback:true,
-            },
+            },*/
+            {
+                type:"overlayEffect",
+                startFrom:"caster",
+                duration:1000,
+                size:50,
+                color:"red",
+                callback:null,
+                isUseCallback:true,
+            }
         ],
         modifiers:{
             J:{//Масштаб

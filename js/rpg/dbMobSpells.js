@@ -26,7 +26,7 @@ const MOB_SPELLS_DATABASE = {
             },
             {
                 type:"flashEffect",
-                duration: 7000,
+                duration: 1000,
                 callback: null,
                 isUseCallback:true,
             }

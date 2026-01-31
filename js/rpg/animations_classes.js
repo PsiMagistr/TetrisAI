@@ -37,6 +37,7 @@ class AnimationSpellFactory{
             jerk:Jerk,
             fireball:Fireball,
             flashEffect:FlashEffect,
+            overlayEffect:OverlayEffect,
         }
         for(let link of configChain){
             const params = {...link};
@@ -57,8 +58,8 @@ class AnimationSpellFactory{
             params.caster = caster;
             params.target = target;
             const AnimationClass = animationList[params.type];
-            console.log("Параметры центровки");
-            console.log(params);
+            //console.log("Параметры центровки");
+            //console.log(params);
             if (AnimationClass) {
                 chain.push(new AnimationClass(params));
             } else {
@@ -112,55 +113,6 @@ class Fireball{
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
 }
-
-/*class Jerk {
-    constructor({ caster, distance = 30, duration = 300 }) {
-        this.caster = caster;
-        // Запоминаем исходную позицию, чтобы точно вернуться в неё
-        this.startX = this.caster.avatar.x;
-
-        // На сколько пикселей сдвинуться (для врага можно передавать отрицательное число)
-        this.distance = distance;
-
-        // Сколько миллисекунд длится рывок
-        this.duration = duration;
-
-        // Счетчик прошедшего времени
-        this.elapsedTime = 0;
-
-        this.isDeleted = false;
-    }
-
-    move(deltaTime) { // deltaTime - время с последнего кадра в мс (обычно ~16)
-        if (this.isDeleted) return;
-
-        // 1. Накапливаем время
-        // (Если deltaTime не пришел, берем 16ms как заглушку для 60fps)
-        this.elapsedTime += (deltaTime || 16);
-
-        // 2. Считаем прогресс от 0.0 до 1.0
-        const progress = this.elapsedTime / this.duration;
-
-        // 3. Если время вышло — завершаем
-        if (progress >= 1) {
-            // ВАЖНО: Принудительно возвращаем в старт, чтобы избежать "уползания" координат
-            this.caster.avatar.x = this.startX;
-            this.isDeleted = true;
-            return;
-        }
-
-        // 4. Вычисляем смещение (Интерполяция)
-        // Math.sin(progress * Math.PI) создает идеальную дугу:
-        // При 0.0 -> sin(0) = 0
-        // При 0.5 -> sin(PI/2) = 1 (Пик рывка)
-        // При 1.0 -> sin(PI) = 0 (Возврат)
-        const offset = Math.sin(progress * Math.PI) * this.distance;
-
-        // 5. Применяем координату
-        this.caster.avatar.x = this.startX + offset;
-    }
-}*/
-
 
 class Jerk {
     constructor({ caster, distance = 30, duration = 300 }) {
@@ -278,5 +230,43 @@ class FlashEffect {
         }
         // 3. Удаляем эффект
         this.isDeleted = true;
+    }
+}
+
+class OverlayEffect{
+    constructor({x,y,size, duration,color,callback, isUseCallback}) {
+        this.isDeleted = false;
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.duration = duration;
+        this.color = color;
+        this.callback = callback;
+        this.opacity = 0;
+        this.elapsedTime = 0;
+        this.isUseCallback = isUseCallback || false;
+    }
+    move(deltaTime){
+        this.elapsedTime += (deltaTime || 16);
+        const progress = this.elapsedTime / this.duration;
+        // 3. Проверка окончания
+        if (progress >= 1) {
+            if(this.isUseCallback){
+                this.callback();
+            }
+            this.isDeleted = true;
+            //this._finish();
+            return;
+        }
+
+        // 4. Математика мигания (Синусоида)
+        this.opacity = Math.sin(progress * Math.PI);
+    }
+    draw(ctx){
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.restore();
     }
 }
