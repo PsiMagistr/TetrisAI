@@ -35,6 +35,7 @@ class Unit extends Subscriber{
     heal(amount){
         const startHp = this.currentHp;
         this.currentHp = clamp(this.currentHp + amount, 0, this.maxHp);
+        this._log(`${this.name} исцелен(а) на ${amount} единиц.`, "heal");
         return this.currentHp - startHp;
     }
     addEffect(effectData){

@@ -250,17 +250,20 @@ class OverlayEffect{
         this.elapsedTime += (deltaTime || 16);
         const progress = this.elapsedTime / this.duration;
         // 3. Проверка окончания
-        if (progress >= 1) {
+        this.opacity = Math.abs(Math.sin(progress * Math.PI));
+        if (progress >= 3) {
+           this._finish();
+
+        }
+
+        // 4. Математика мигания (Синусоида)
+
+    }
+    _finish(){
             if(this.isUseCallback){
                 this.callback();
             }
             this.isDeleted = true;
-            //this._finish();
-            return;
-        }
-
-        // 4. Математика мигания (Синусоида)
-        this.opacity = Math.sin(progress * Math.PI);
     }
     draw(ctx){
         ctx.save();

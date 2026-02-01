@@ -158,9 +158,9 @@ class BattleManager extends Subscriber{
         this.player.spendMp(mp);
         delete cost.MP;
         this.resourceManager.spendResources(cost);
-        const spellPreview = this.spellBuilder.build();
-        const width = this.player.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
-        const height = this.player.avatar.height || GRAPHICS_CONFIG.units.defaultSize;
+       // const spellPreview = this.spellBuilder.build();
+       // const width = this.player.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
+       // const height = this.player.avatar.height || GRAPHICS_CONFIG.units.defaultSize;
         this.eventBus.emit(EVENTS.RESOURCES.UPDATE, this.resourceManager.getResources());
         const animationContainer = this.animationSpellFactory.createSpellAnimation(
             this.player,
@@ -181,32 +181,6 @@ class BattleManager extends Subscriber{
     _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         setTimeout(()=>{
-            /*const width = this.enemy.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
-            const height = this.enemy.avatar.height || GRAPHICS_CONFIG.units.defaultSize;
-            const spell = {
-                name:"Атака мечом",
-                type:"ATTACK",
-                power:10,
-            }
-            const params = {
-                x: this.enemy.avatar.x + width / 2 - 20 / 2,
-                y:this.enemy.avatar.y + height / 2 - 20 / 2,
-                speed:-3,
-                size:10,
-                color:"red",
-                targetX:this.player.avatar.x,
-                callback:this.onHit.bind(this, spell, this.enemy, this.player),
-            }
-            const params2 = {
-                caster:this.enemy,
-                distance:-30,
-                duration:300,
-            }
-            const container = new AnimationContainer([
-                new Jerk(params2),
-                new Fireball(params)
-            ]);
-            this.battleState.animations.push(container);*/
             //Здесь будет атака
             //Переписано
             const spellList = this.enemy.spellList;
@@ -257,10 +231,18 @@ class BattleManager extends Subscriber{
         return result;
     }
     onHit(spell, caster, target){
-        let animations = this.battleState.animations;
-        if(spell.type == "ATTACK"){
-            this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
-            target.takeDamage(spell.power);
+        this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
+        const actions = {
+            ATTACK:()=>{
+               // this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
+                target.takeDamage(spell.power);
+            },
+            HEAL:()=>{
+                caster.heal(spell.power);
+            }
+        }
+        if(actions[spell.type]){
+            actions[spell.type]();
         }
         this._log("Конец хода", "system")
         caster.type == "player"?this._enemyTurn():this._playerTurn();
