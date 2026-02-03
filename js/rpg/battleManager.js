@@ -147,8 +147,9 @@ class BattleManager extends Subscriber{
     handleCast(){
         if (!this.isPlayerTurn) return;
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
-        console.log("+++++++++++++++");
+        console.log("!+++++++++++++++!");
         const spell = this.spellBuilder.build();
+        console.log(spell.effect);
         if(!spell || !spell.isValid){
             console.log("Не хватает ресурсов.");
             return;
@@ -158,9 +159,6 @@ class BattleManager extends Subscriber{
         this.player.spendMp(mp);
         delete cost.MP;
         this.resourceManager.spendResources(cost);
-       // const spellPreview = this.spellBuilder.build();
-       // const width = this.player.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
-       // const height = this.player.avatar.height || GRAPHICS_CONFIG.units.defaultSize;
         this.eventBus.emit(EVENTS.RESOURCES.UPDATE, this.resourceManager.getResources());
         const animationContainer = this.animationSpellFactory.createSpellAnimation(
             this.player,

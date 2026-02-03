@@ -38,34 +38,13 @@ class Unit extends Subscriber{
         this._log(`${this.name} исцелен(а) на ${amount} единиц.`, "heal");
         return this.currentHp - startHp;
     }
-    addEffect(effectData){
-        const existing = this.activeEffects.find(effect => effect.id === effectData.id);
-        if(!existing){
-            this.activeEffects.push({...effectData});
-        }
+    addEffect(effect){
+       this.activeEffects.push(effect);
     }
-    processActiveEffects(){
-        const effectExecuters = {
-            HEAL:(effect)=>{
-                const actualHeal = this.heal(effect.power);
-                const message = `На игроке ${this.name} эффект ${effect.name} на ${actualHeal} ед.`;
-                this._log("system", message);
-            },
-            BURN:(effect)=>{
-                const actualDamage = this.takeDamage(effect.power);
-                const message = `На игроке ${this.name} эффект ${effect.name} на ${actualDamage}`;
-                this._log("system", message);
-            }
-        }
-        if(this.activeEffects.length == 0) return
-            this.activeEffects.forEach((effect)=>{
-                if(effect.duration > 0){
-                    if(effectExecuters[effect.id]){
-                        effectExecuters[effect.id](effect);
-                    }
-                    effect.duration--;
-                }
-            });
+    tickActiveEffects(){
+        this.activeEffects.forEach(effect => {
+            effect.tick();
+        })
         this.activeEffects = this.activeEffects.filter((effect)=>effect.duration > 0);
     }
     _log(message, type){
