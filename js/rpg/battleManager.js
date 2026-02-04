@@ -14,6 +14,7 @@ class BattleManager extends Subscriber{
         this.isPlayerTurn = true;
         this.loadingPromise = this.assetManager.preload(assetsConfig);
         this.animationSpellFactory = new AnimationSpellFactory();
+        this.effectFactory = new EffectFactory();
         this.battleState = {
             resources:null,
         };
@@ -171,6 +172,7 @@ class BattleManager extends Subscriber{
     _playerTurn(){
         setTimeout(()=>{
             this._log("Ваш ход!", "system");
+            this.player.tickActiveEffects();
             this.spellBuilder.reset();
             this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:true});
             this.isPlayerTurn = true;
@@ -179,8 +181,8 @@ class BattleManager extends Subscriber{
     _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         setTimeout(()=>{
-            //Здесь будет атака
-            //Переписано
+            this._log("Ход противника!", "system");
+            this.enemy.tickActiveEffects();
             const spellList = this.enemy.spellList;
             if (!spellList || spellList.length === 0) {
                 console.warn("У врага нет заклинаний! Пропуск хода.");
@@ -207,7 +209,6 @@ class BattleManager extends Subscriber{
             );
             this.battleState.animations.push(animationContainer);
             this.isPlayerTurn = false;
-            this._log("Ход противника!", "system");
 
         },1000)
     }
@@ -240,9 +241,15 @@ class BattleManager extends Subscriber{
             }
         }
         if(actions[spell.type]){
+            const config = spell.effect;
+            let effect;
             actions[spell.type]();
+            if(config !== null){
+                effect = this.effectFactory.create(config,caster, target);
+                effect.target.addEffect(effect);
+            }
         }
-        this._log("Конец хода", "system")
+        this._log("Конец хода", "system");
         caster.type == "player"?this._enemyTurn():this._playerTurn();
     }
     update(deltaTime){

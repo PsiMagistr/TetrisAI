@@ -27,9 +27,7 @@ class EffectFactory{
                 duration:config.duration,
                 target:config.target == "SELF"?caster:target,
             }
-
             return new EffectClass(params);
-
     }
 }
 
@@ -50,9 +48,9 @@ class BurnEffect extends StatusEffect{
         super({id, name, target, power, duration});
     }
     tick() {
+        const message = `Эффект ${this.name} наложен на ${this.target.name} осталось: ${this.duration} хода.`;
+        this.target._log(message, `${this.target.type}-action`);
         const actualDamage = this.target.takeDamage(this.power);
-        const message = `На игроке ${this.target.name} эффект ${this.name} на ${actualDamage}`;
-        this.target._log(message, "enemy-action");
         super.tick();
     }
 }

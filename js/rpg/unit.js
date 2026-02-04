@@ -38,8 +38,10 @@ class Unit extends Subscriber{
         this._log(`${this.name} исцелен(а) на ${amount} единиц.`, "heal");
         return this.currentHp - startHp;
     }
-    addEffect(effect){
+    addEffect(effect){       ;
        this.activeEffects.push(effect);
+        const message = `Эффект ${effect.name} наложен на ${this.name} длительность ${effect.duration} хода.`;
+       this._log(message, `${this.type}-action`);
     }
     tickActiveEffects(){
         this.activeEffects.forEach(effect => {

@@ -1,8 +1,8 @@
 const ENEMIES = {
     KNIGHT:{
         name:"Темный рыцарь",
-            baseHp:300,
-            currentHp:300,
+            baseHp:100,
+            currentHp:100,
             baseMp:100,
             currentMp:100,
             baseStats:{atk:8, def:0,speed:1},
