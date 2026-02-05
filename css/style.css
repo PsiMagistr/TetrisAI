@@ -613,6 +613,13 @@ body {
     color: #2ecc71; /* Яркий зеленый */
 }
 
+.log-entry.effect {
+    color: #FFB6C1;
+}
+.log-entry.effect-start {
+    color: #DEB887;
+}
+
 /* 4. СИСТЕМА / ИНФО (Желтый/Золотой) - Начало боя, Ход */
 .log-entry.system {
     color: #f1c40f;

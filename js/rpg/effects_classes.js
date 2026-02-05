@@ -8,14 +8,12 @@
 * type
 * */
 
-
-
-
 class EffectFactory{
     constructor(){}
     create(config, caster, target){
         const effectsList = {
             BURN:BurnEffect,
+            REGEN:HealEffect,
         }
         const EffectClass = effectsList[config.id];
         if(!EffectClass) throw new Error("EffectClass not found");
@@ -41,6 +39,8 @@ class StatusEffect{
     }
     tick(){
         this.duration--;
+        const message = `Эффект ${this.name} будет применен на ${this.target.name}. Осталось: ${this.duration} ход(а).`;
+        this.target._log(message, `effect`);
     }
 }
 class BurnEffect extends StatusEffect{
@@ -48,9 +48,19 @@ class BurnEffect extends StatusEffect{
         super({id, name, target, power, duration});
     }
     tick() {
-        const message = `Эффект ${this.name} наложен на ${this.target.name} осталось: ${this.duration} хода.`;
-        this.target._log(message, `${this.target.type}-action`);
-        const actualDamage = this.target.takeDamage(this.power);
         super.tick();
+        this.target.takeDamage(this.power);
+
     }
 }
+
+class HealEffect extends StatusEffect{
+    constructor({id, name, target, power, duration}) {
+        super({id, name, target, power, duration});
+    }
+    tick() {
+        super.tick();
+        const heal = this.target.heal(this.power);
+    }
+}
+

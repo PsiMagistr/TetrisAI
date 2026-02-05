@@ -40,8 +40,8 @@ class Unit extends Subscriber{
     }
     addEffect(effect){       ;
        this.activeEffects.push(effect);
-        const message = `Эффект ${effect.name} наложен на ${this.name} длительность ${effect.duration} хода.`;
-       this._log(message, `${this.type}-action`);
+        const message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+       this._log(message, `effect-start`);
     }
     tickActiveEffects(){
         this.activeEffects.forEach(effect => {

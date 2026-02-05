@@ -51,7 +51,7 @@ const SPELLS_DATABASE = {
                 type: "DEBUFF",
                 cost:{Z:10},
                 baseDuration: 1,
-                effectPower: 0.2
+                effectPower: 2.0//0.2
             },
             S:{//Бафф.
               enabled: false,
