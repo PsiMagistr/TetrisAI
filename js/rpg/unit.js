@@ -38,9 +38,22 @@ class Unit extends Subscriber{
         this._log(`${this.name} исцелен(а) на ${amount} единиц.`, "heal");
         return this.currentHp - startHp;
     }
-    addEffect(effect){       ;
-       this.activeEffects.push(effect);
-        const message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+    addEffect(effect){
+       const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);
+       let message = "";
+       if(activeEffect){
+           if(effect.extension){
+               activeEffect.duration = effect.duration;
+               message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
+           }
+           else{
+               message = `Эффект ${activeEffect.name} не может быть продлен. Длительность ${activeEffect.duration} ход(а).`;
+           }
+       }
+       else{
+           this.activeEffects.push(effect);
+           message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+       }
        this._log(message, `effect-start`);
     }
     tickActiveEffects(){

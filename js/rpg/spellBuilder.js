@@ -107,6 +107,7 @@ class SpellBuilder {
                 target:mod.target,
                 duration: (mod.baseDuration || 1) + bonusDur,
                 power: Math.floor(finalPower * (mod.effectPower || 0)),
+                extension:mod.extension || false,
             }
 
         }

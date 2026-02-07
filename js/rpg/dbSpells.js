@@ -51,7 +51,8 @@ const SPELLS_DATABASE = {
                 type: "DEBUFF",
                 cost:{Z:10},
                 baseDuration: 1,
-                effectPower: 2.0//0.2
+                effectPower: 0.2,
+                extension:true,
             },
             S:{//Бафф.
               enabled: false,
@@ -98,7 +99,8 @@ const SPELLS_DATABASE = {
                 type: "BUFF",
                 cost: {S:10,MP:10},
                 baseDuration: 1, // Висит 2 хода + бонусы от I
-                effectPower: 0.5 // Лечит 50% от силы заклинания каждый ход
+                effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
+                extension:false,
             }
         },
     },

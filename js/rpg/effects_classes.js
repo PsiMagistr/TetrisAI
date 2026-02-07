@@ -24,18 +24,20 @@ class EffectFactory{
                 power:config.power,
                 duration:config.duration,
                 target:config.target == "SELF"?caster:target,
+                extension:config.extension || false,
             }
             return new EffectClass(params);
     }
 }
 
 class StatusEffect{
-    constructor({id, name, target, power, duration}){
+    constructor({id, name, target, power, duration, extension}){
         this.id = id;
         this.target = target;
         this.name = name;
         this.power = power;
         this.duration = duration;
+        this.extension = extension;
     }
     tick(){
         this.duration--;
@@ -44,8 +46,8 @@ class StatusEffect{
     }
 }
 class BurnEffect extends StatusEffect{
-    constructor({id, name, target, power, duration}) {
-        super({id, name, target, power, duration});
+    constructor({id, name, target, power, duration, extension}) {
+        super({id, name, target, power, duration, extension});
     }
     tick() {
         super.tick();
@@ -55,8 +57,8 @@ class BurnEffect extends StatusEffect{
 }
 
 class HealEffect extends StatusEffect{
-    constructor({id, name, target, power, duration}) {
-        super({id, name, target, power, duration});
+    constructor({id, name, target, power, duration, extension}) {
+        super({id, name, target, power, duration, extension});
     }
     tick() {
         super.tick();

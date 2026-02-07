@@ -36,10 +36,20 @@ const MOB_SPELLS_DATABASE = {
                 enabled:false,
             },
             I:{
-                enabled:false,
+                enabled:true,
+                levels:[0, 1, 2],
+                costs:[{MP:0},{MP:0},{MP:0}],
             },
             Z:{
-                enabled:false,
+                enabled:true,
+                effectId: "BURN",
+                name:"Кровотечение",
+                target: "ENEMY", // <--- Явно указываем цель
+                type: "DEBUFF",
+                cost:{Z:0},
+                baseDuration: 1,
+                effectPower: 0.2,
+                extension:false,
             },
             S:{
                 enabled:false,
