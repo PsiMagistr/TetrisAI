@@ -106,5 +106,69 @@ updateSpellPreview(spellData) {
 
 
 
+/*build(){
+        let spellConfig = this._getSpellConfig(this.currentSpellId);
+        if(!spellConfig) return null;
+        const st = this.state;
+        let totalCost = {...spellConfig.baseCost};
+        const mergeCost = (costObject)=>{
+            if(!costObject) return
+            for(const [resKey, value] of Object.entries(costObject)){
+                if(value === 0) continue; // Добавил эту строчку
+                totalCost[resKey] = (totalCost[resKey] || 0) + value;
+            }
+        }
+        //J
+        let scaleMult = 1.0;
+        if(spellConfig.modifiers.J?.enabled){
+            const costObj = spellConfig.modifiers.J.costs[st.J];
+            mergeCost(costObj);
+            scaleMult = spellConfig.modifiers.J.levels[st.J];
+        }
+        //I
+        let bonusDur = 0;
+        if(spellConfig.modifiers.I?.enabled){
+            if (st.S || st.Z){
+                const costObj = spellConfig.modifiers.I.costs[st.I];
+                mergeCost(costObj);
+                bonusDur = spellConfig.modifiers.I.levels[st.I];
+            }
+        }
+        let activeEffect = null;
+        const effKey = st.Z? "Z":(st.S?"S":null); //Или бафф, или дебафф.
+        const finalPower = Math.floor(spellConfig.basePower * scaleMult);
+        if(effKey && spellConfig.modifiers[effKey]?.enabled){
+            const mod  = spellConfig.modifiers[effKey];
+            mergeCost(mod.cost);
+            activeEffect = {
+                id:mod.effectId,
+                name:mod.name,
+                type : mod.type,
+                target:mod.target,
+                duration: (mod.baseDuration || 1) + bonusDur,
+                power: Math.floor(finalPower * (mod.effectPower || 0)),
+                extension:mod.extension || false,
+            }
+
+        }
+        const isValid = this._checkResources(totalCost);
+        return new CastableSpell({
+            id: spellConfig.id,
+            name: spellConfig.name,
+            type: spellConfig.type,
+            icon: spellConfig.icon,
+            totalCost: totalCost,
+            power: finalPower,
+            effect: activeEffect,
+            modifiers:spellConfig.modifiers,
+            modifiersState:{...this.state},
+            animationChain:spellConfig.animationChain,
+            isValid:isValid,
+        });
+    }*/
+
+
+
+
 
 

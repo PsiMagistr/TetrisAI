@@ -14,8 +14,18 @@ class SpellBuilder {
         }
         return this;
     }
+    _getSpellConfig(spellId){
+        if(SPELLS_DATABASE[spellId]){
+            return SPELLS_DATABASE[spellId];
+        }
+        if(MOB_SPELLS_DATABASE[spellId]){
+            return MOB_SPELLS_DATABASE[spellId];
+        }
+        return null;
+    }
     setBaseSpell(spellId){
-        if(!SPELLS_DATABASE[spellId] && !MOB_SPELLS_DATABASE[spellId]){
+        const spellConfig = this._getSpellConfig(spellId);
+        if(!spellConfig){
             console.error(`SpellBuilder: Заклинание ${spellId} не найдено`);
             return this;
         }
@@ -42,12 +52,9 @@ class SpellBuilder {
         return this;
     }
     toggleModifier(key){
-        if(!this.currentSpellId) return this;
-        let spell = SPELLS_DATABASE[this.currentSpellId];
-        if(!spell){
-           spell = MOB_SPELLS_DATABASE[this.currentSpellId];
-        }
-        const mod = spell.modifiers[key];
+        const spellConfig = this._getSpellConfig(this.currentSpellId);
+        if(!spellConfig) return this;
+        const mod = spellConfig.modifiers[key];
         if(!mod || !mod.enabled) return this;
         if(key === "J" || key === "I"){
             const nextLevel = (this.state[key] + 1) % mod.levels.length;
@@ -62,68 +69,73 @@ class SpellBuilder {
         return this
     }
 
-    build(){
-        if(!this.currentSpellId) return null;
-        //const spell = SPELLS_DATABASE[this.currentSpellId];
-        let spell = SPELLS_DATABASE[this.currentSpellId];
-        if(!spell){
-            spell = MOB_SPELLS_DATABASE[this.currentSpellId];
+    _mergeCost(draft, costObject){
+        if(!costObject) return
+        for(const [resKey, value] of Object.entries(costObject)){
+            if(value === 0) continue; // Добавил эту строчку
+            draft.totalCost[resKey] = (draft.totalCost[resKey] || 0) + value;
         }
-        const st = this.state;
-        let totalCost = {...spell.baseCost};
-        const mergeCost = (costObject)=>{
-            if(!costObject) return
-            for(const [resKey, value] of Object.entries(costObject)){
-                if(value === 0) continue; // Добавил эту строчку
-                totalCost[resKey] = (totalCost[resKey] || 0) + value;
+    }
+    _applyScale(draft){
+        if(draft.spellConfig.modifiers.J?.enabled){
+            const costObj = draft.spellConfig.modifiers.J.costs[draft.state.J];
+            this._mergeCost(draft, costObj);
+            draft.scaleMult = draft.spellConfig.modifiers.J.levels[draft.state.J];
+        }
+    }
+    _applyEffect(draft){
+        if(draft.spellConfig.modifiers.I?.enabled){
+            if(draft.state.S || draft.state.Z){
+                const costObj = draft.spellConfig.modifiers.I.costs[draft.state.I];
+                this._mergeCost(draft,costObj);
+                draft.bonusDuration = draft.spellConfig.modifiers.I.levels[draft.state.I];
             }
         }
-        //J
-        let scaleMult = 1.0;
-        if(spell.modifiers.J?.enabled){
-            const costObj = spell.modifiers.J.costs[st.J];
-            mergeCost(costObj);
-            scaleMult = spell.modifiers.J.levels[st.J];
-        }
-        //I
-        let bonusDur = 0;
-        if(spell.modifiers.I?.enabled){
-            if (st.S || st.Z){
-                const costObj = spell.modifiers.I.costs[st.I];
-                mergeCost(costObj);
-                bonusDur = spell.modifiers.I.levels[st.I];
-            }
-        }
-        let activeEffect = null;
-        const effKey = st.Z? "Z":(st.S?"S":null); //Или бафф, или дебафф.
-        const finalPower = Math.floor(spell.basePower * scaleMult);
-        if(effKey && spell.modifiers[effKey]?.enabled){
-            const mod  = spell.modifiers[effKey];
-            mergeCost(mod.cost);
-            activeEffect = {
+        const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
+        draft.finalPower = Math.floor(draft.spellConfig.basePower * draft.scaleMult);
+        if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
+            const mod  = draft.spellConfig.modifiers[effKey];
+            this._mergeCost(draft, mod.cost);
+            draft.activeEffect = {
                 id:mod.effectId,
                 name:mod.name,
                 type : mod.type,
                 target:mod.target,
-                duration: (mod.baseDuration || 1) + bonusDur,
-                power: Math.floor(finalPower * (mod.effectPower || 0)),
+                duration: (mod.baseDuration || 1) + draft.bonusDuration,
+                power: Math.floor(draft.finalPower * (mod.effectPower || 0)),
                 extension:mod.extension || false,
             }
-
         }
-        const isValid = this._checkResources(totalCost);
+    }
+    build(){
+        let spellConfig = this._getSpellConfig(this.currentSpellId);
+        if(!spellConfig) return null;
+        const draft = {
+            spellConfig:spellConfig,
+            state:this.state,
+            finalPower:spellConfig.basePower,
+            totalCost:{...spellConfig.baseCost},
+            scaleMult:1.0,
+            activeEffect:null,
+            bonusDuration:0,
+            isValid:false,
+        }
+        //J
+        this._applyScale(draft);
+        this._applyEffect(draft);
+        draft.isValid = this._checkResources(draft.totalCost);
         return new CastableSpell({
-            id: spell.id,
-            name: spell.name,
-            type: spell.type,
-            icon: spell.icon,
-            totalCost: totalCost,
-            power: finalPower,
-            effect: activeEffect,
-            modifiers:spell.modifiers,
+            id: draft.spellConfig.id,
+            name: draft.spellConfig.name,
+            type: draft.spellConfig.type,
+            icon: draft.spellConfig.icon,
+            totalCost: draft.totalCost,
+            power: draft.finalPower,
+            effect: draft.activeEffect,
+            modifiers:draft.spellConfig.modifiers,
             modifiersState:{...this.state},
-            animationChain:spell.animationChain,
-            isValid:isValid,
+            animationChain:draft.spellConfig.animationChain,
+            isValid:draft.isValid,
         });
     }
     _checkResources(cost) {
