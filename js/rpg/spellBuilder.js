@@ -81,19 +81,17 @@ class SpellBuilder {
             const costObj = draft.spellConfig.modifiers.J.costs[draft.state.J];
             this._mergeCost(draft, costObj);
             draft.scaleMult = draft.spellConfig.modifiers.J.levels[draft.state.J];
+            draft.finalPower = Math.floor(draft.spellConfig.basePower * draft.scaleMult);
         }
     }
     _applyEffect(draft){
-        if(draft.spellConfig.modifiers.I?.enabled){
-            if(draft.state.S || draft.state.Z){
+        const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
+        if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
+            if(draft.spellConfig.modifiers.I?.enabled){
                 const costObj = draft.spellConfig.modifiers.I.costs[draft.state.I];
                 this._mergeCost(draft,costObj);
                 draft.bonusDuration = draft.spellConfig.modifiers.I.levels[draft.state.I];
             }
-        }
-        const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
-        draft.finalPower = Math.floor(draft.spellConfig.basePower * draft.scaleMult);
-        if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
             const mod  = draft.spellConfig.modifiers[effKey];
             this._mergeCost(draft, mod.cost);
             draft.activeEffect = {
