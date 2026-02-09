@@ -37,11 +37,13 @@ const SPELLS_DATABASE = {
                 enabled:true,
                 levels:[1.0, 1.25, 1.50, 2.0],
                 costs:[{J:0, MP:0},{J:5, MP:0},{J:10, MP:0},{J:15, MP:0}],
+                behavior:"cycle",
             },
             I:{//Длительность
                 enabled:true,
                 levels:[0, 1, 2],
                 costs:[{I:0, MP:0},{I:10, MP:100},{I:30, MP:0}],
+                behavior:"cycle",
             },
             Z:{//Дебафф
                 enabled:true,
@@ -53,6 +55,8 @@ const SPELLS_DATABASE = {
                 baseDuration: 1,
                 effectPower: 0.2,
                 extension:true,
+                behavior:"toggle",
+                group:"effect",
             },
             S:{//Бафф.
               enabled: false,
@@ -82,6 +86,7 @@ const SPELLS_DATABASE = {
                 enabled:true,
                 levels:[1.0, 1.25, 1.50, 2.0],
                 costs:[{J:0, MP:0},{J:5, MP:0},{J:10, MP:0},{J:15, MP:0}],
+                behavior:"cycle",
             },
             Z:{
                 enabled:false,
@@ -90,6 +95,7 @@ const SPELLS_DATABASE = {
                 enabled:true,
                 levels:[0, 1, 2],
                 costs:[{I:0, MP:0},{I:10, MP:0},{I:30, MP:0}],
+                behavior:"cycle",
             },
             S: {
                 enabled: true,
@@ -101,6 +107,8 @@ const SPELLS_DATABASE = {
                 baseDuration: 1, // Висит 2 хода + бонусы от I
                 effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
                 extension:false,
+                behavior:"toggle",
+                group:"effect",
             }
         },
     },

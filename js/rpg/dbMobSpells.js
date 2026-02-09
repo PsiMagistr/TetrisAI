@@ -39,6 +39,7 @@ const MOB_SPELLS_DATABASE = {
                 enabled:true,
                 levels:[0, 1, 2],
                 costs:[{MP:0},{MP:0},{MP:0}],
+                behavior:"cycle",
             },
             Z:{
                 enabled:true,
@@ -50,6 +51,7 @@ const MOB_SPELLS_DATABASE = {
                 baseDuration: 1,
                 effectPower: 0.2,
                 extension:false,
+                behavior:"toggle",
             },
             S:{
                 enabled:false,

@@ -41,7 +41,7 @@ class SpellBuilder {
         this.state.I = level;
         return this;
     }
-    setDebuff(enabled){
+    /*setDebuff(enabled){
         this.state.Z = enabled;
         if(enabled) this.state.S = false;
         return this;
@@ -50,21 +50,37 @@ class SpellBuilder {
         this.state.S = enabled;
         if(enabled) this.state.Z = false;
         return this;
+    }*/
+    _cycleLevel(key, modConfig) {
+        const nextLevel = (this.state[key] + 1) % modConfig.levels.length;
+        if (key === "J") this.setScaleLevel(nextLevel);
+        if (key === "I") this.setDurationLevel(nextLevel);
+    }
+    _toggleSwitch(key, modifiers){
+       const groupValue = modifiers[key].group;
+       let wasActive =  this.state[key];
+       if (!groupValue){
+           this.state[key] = !wasActive;
+           return;
+       }
+       for(const k in modifiers){
+            const modifier = modifiers[k];
+            if(modifier.group === groupValue){
+                this.state[k] = false;
+            }
+       }
+       this.state[key] = !wasActive;
     }
     toggleModifier(key){
         const spellConfig = this._getSpellConfig(this.currentSpellId);
         if(!spellConfig) return this;
-        const mod = spellConfig.modifiers[key];
-        if(!mod || !mod.enabled) return this;
-        if(key === "J" || key === "I"){
-            const nextLevel = (this.state[key] + 1) % mod.levels.length;
-            if(key === "J") this.setScaleLevel(nextLevel);
-            if(key === "I") this.setDurationLevel(nextLevel);
+        const modConfig = spellConfig.modifiers[key];
+        if(!modConfig || !modConfig.enabled) return this;
+        if(modConfig.behavior == "cycle"){
+           this._cycleLevel(key, modConfig);
         }
         else{
-            const nextState = !this.state[key];
-            if(key === "Z")  this.setDebuff(nextState);
-            if(key === "S") this.setBuff(nextState);
+            this._toggleSwitch(key, spellConfig.modifiers);
         }
         return this
     }
@@ -84,7 +100,7 @@ class SpellBuilder {
             draft.finalPower = Math.floor(draft.spellConfig.basePower * draft.scaleMult);
         }
     }
-    _applyEffect(draft){
+    _calculateActiveEffect(draft){
         const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
         if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
             if(draft.spellConfig.modifiers.I?.enabled){
@@ -120,7 +136,7 @@ class SpellBuilder {
         }
         //J
         this._applyScale(draft);
-        this._applyEffect(draft);
+        this._calculateActiveEffect(draft);
         draft.isValid = this._checkResources(draft.totalCost);
         return new CastableSpell({
             id: draft.spellConfig.id,
