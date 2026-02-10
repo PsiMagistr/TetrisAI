@@ -6,6 +6,12 @@ function clamp(value, min, max){
      return Math.max(min, Math.min(max, value));
 }
 
+function delay(ms){
+    return new Promise((resolve)=>{
+       setTimeout(resolve, ms);
+    })
+}
+
 class Subscriber{
     constructor(eventBus){
         this.eventBus = eventBus;

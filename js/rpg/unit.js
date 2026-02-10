@@ -56,10 +56,11 @@ class Unit extends Subscriber{
        }
        this._log(message, `effect-start`);
     }
-    tickActiveEffects(){
-        this.activeEffects.forEach(effect => {
+    async tickActiveEffects(){
+        for(let effect of this.activeEffects){
+            await delay(1000);
             effect.tick();
-        })
+        }
         this.activeEffects = this.activeEffects.filter((effect)=>effect.duration > 0);
     }
     _log(message, type){

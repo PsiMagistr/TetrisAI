@@ -169,20 +169,22 @@ class BattleManager extends Subscriber{
         )
         this.battleState.animations.push(animationContainer);
     }
-    _playerTurn(){
-        setTimeout(()=>{
+    async _playerTurn(){
+        //setTimeout(()=>{
+            await delay(1000);
             this._log("Ваш ход!", "system");
-            this.player.tickActiveEffects();
+            await this.player.tickActiveEffects();
             this.spellBuilder.reset();
             this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:true});
             this.isPlayerTurn = true;
-        },1000)
+       // },1000)
     }
-    _enemyTurn(){
+    async _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
-        setTimeout(()=>{
+        await delay(1000);
+        //setTimeout(()=>{
             this._log("Ход противника!", "system");
-            this.enemy.tickActiveEffects();
+            await this.enemy.tickActiveEffects();
             const spellList = this.enemy.spellList;
             if (!spellList || spellList.length === 0) {
                 console.warn("У врага нет заклинаний! Пропуск хода.");
@@ -214,7 +216,7 @@ class BattleManager extends Subscriber{
             );
             this.battleState.animations.push(animationContainer);
             this.isPlayerTurn = false;
-        },1000)
+       // },1000)
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {message, type});
