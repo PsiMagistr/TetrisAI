@@ -54,6 +54,22 @@ class BattleRenderer extends Subscriber{
         this.ctx.strokeRect(unit.avatar.x, unit.avatar.y, spriteW, spriteH);
         this.drawBar(hpX, hpY, unit.maxHp, unit.currentHp, hpBarWidth, this.config.ui.hpBar);
         this.drawBar(mpX, mpY, unit.maxMp, unit.currentMp, mpBarWidth, this.config.ui.mpBar);
+        this.drawEffects(unit, mpX, mpY + this.config.ui.mpBar.height + 4, 20, "red");
+    }
+    drawEffects(unit, x, y , size, color){
+        let drawnCount = 0;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = "15px Arial";
+        for(let i = 0; i < unit.activeEffects.length; i++){
+            const duration = unit.activeEffects[i].duration;
+            if(duration <= 0) continue;
+            this.ctx.fillStyle = color;
+            this.ctx.fillRect(x + (size+1) * drawnCount, y, size, size);
+            this.ctx.fillStyle = "#000000";
+            this.ctx.fillText(duration, x + (size+1) * drawnCount + size / 2, y + size / 2);
+            drawnCount++;
+        }
     }
     drawAnimations(animations){
        for(const anim of animations){
