@@ -118,6 +118,7 @@ class SpellBuilder {
                 duration: (mod.baseDuration || 1) + draft.bonusDuration,
                 power: Math.floor(draft.finalPower * (mod.effectPower || 0)),
                 extension:mod.extension || false,
+                iconIndex:mod.iconIndex,
             }
         }
     }

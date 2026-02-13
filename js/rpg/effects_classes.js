@@ -10,7 +10,7 @@
 
 class EffectFactory{
     constructor(){}
-    create(config, caster, target){
+    create(config, sprite, caster, target){
         const effectsList = {
             BURN:BurnEffect,
             REGEN:HealEffect,
@@ -25,19 +25,23 @@ class EffectFactory{
                 duration:config.duration,
                 target:config.target == "SELF"?caster:target,
                 extension:config.extension || false,
+                iconIndex:config.iconIndex,
+                sprite:sprite || null,
             }
             return new EffectClass(params);
     }
 }
 
 class StatusEffect{
-    constructor({id, name, target, power, duration, extension}){
+    constructor({id, name, sprite, target, power, duration, extension, iconIndex}){
         this.id = id;
         this.target = target;
         this.name = name;
         this.power = power;
         this.duration = duration;
         this.extension = extension;
+        this.sprite = sprite;
+        this.iconIndex = iconIndex;
     }
     tick(){
         this.duration--;
@@ -46,8 +50,8 @@ class StatusEffect{
     }
 }
 class BurnEffect extends StatusEffect{
-    constructor({id, name, target, power, duration, extension}) {
-        super({id, name, target, power, duration, extension});
+    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, sprite, target, power, duration, extension, iconIndex});
     }
     tick() {
         super.tick();
@@ -57,8 +61,8 @@ class BurnEffect extends StatusEffect{
 }
 
 class HealEffect extends StatusEffect{
-    constructor({id, name, target, power, duration, extension}) {
-        super({id, name, target, power, duration, extension});
+    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, sprite, target, power, duration, extension, iconIndex});
     }
     tick() {
         super.tick();

@@ -248,10 +248,11 @@ class BattleManager extends Subscriber{
         }
         if(actions[spell.type]){
             const config = spell.effect;
+            const sprite = this.assetManager.getPictureByKey("SPELL_EFFECTS");
             let effect;
             actions[spell.type]();
             if(config !== null){
-                effect = this.effectFactory.create(config,caster, target);
+                effect = this.effectFactory.create(config, sprite, caster, target);
                 effect.target.addEffect(effect);
             }
         }

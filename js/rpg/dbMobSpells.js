@@ -51,6 +51,7 @@ const MOB_SPELLS_DATABASE = {
                 baseDuration: 1,
                 effectPower: 0.2,
                 extension:false,
+                iconIndex:1,
                 behavior:"toggle",
             },
             S:{

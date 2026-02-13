@@ -55,6 +55,7 @@ const SPELLS_DATABASE = {
                 baseDuration: 1,
                 effectPower: 0.2,
                 extension:true,
+                iconIndex:1,
                 behavior:"toggle",
                 group:"effect",
             },
@@ -106,6 +107,7 @@ const SPELLS_DATABASE = {
                 cost: {S:10,MP:10},
                 baseDuration: 1, // Висит 2 хода + бонусы от I
                 effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
+                iconIndex:0,
                 extension:false,
                 behavior:"toggle",
                 group:"effect",
