@@ -47,7 +47,7 @@ class Unit extends Subscriber{
                message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
            }
            else{
-               message = `Эффект ${activeEffect.name} не может быть продлен. Длительность ${activeEffect.duration} ход(а).`;
+               message = `Эффект ${activeEffect.name} не может быть обновлен. Длительность ${activeEffect.duration} ход(а).`;
            }
        }
        else{
@@ -82,7 +82,7 @@ class Unit extends Subscriber{
             this.activeEffects = this.activeEffects.filter((effect)=>effect.id !== id);
             message = `${this.name} очищен(а) от ${effectName}.`;
         }
-        this._log(message, `effect-cleaned`);
+        this._log(message, `effect`);
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {type, message});

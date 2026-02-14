@@ -195,10 +195,10 @@ class BattleManager extends Subscriber{
             const aiBuilder = new SpellBuilder(null, this.enemy);
             const countMod = 1;
             aiBuilder.setBaseSpell(randomId);
-            /*aiBuilder.toggleModifier("Z");
+            aiBuilder.toggleModifier("Z");
             for(let i = 0; i < countMod; i++){
                 aiBuilder.toggleModifier("I");
-            }*/
+            }
             const enemySpell = aiBuilder.build();
             if(!enemySpell.isValid){
                 this._log(`${this.enemy.name} пытается использовать ${enemySpell.name}, но не хватает манны.`, "enemy-action");

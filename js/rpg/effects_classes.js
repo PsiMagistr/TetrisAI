@@ -75,3 +75,18 @@ class HealEffect extends StatusEffect{
     }
 }
 
+class ShieldEffect extends StatusEffect{
+    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, sprite, target, power, duration, extension, iconIndex});
+    }
+    onApply() {
+       this.target.removeRandomDebuff();
+       this.target.stats.def += this.power;
+       if(this.power > 0) this.target._log(`Защита ${this.target.name} увеличена на ${this.power}`,`effect`);
+    }
+    onRemove() {
+        super.onRemove();
+        this.target.stats.def -= this.power;
+        this.target._log(`Защита ${this.target.name} равна ${this.target.stats.def}`,`effect`);
+    }
+}
