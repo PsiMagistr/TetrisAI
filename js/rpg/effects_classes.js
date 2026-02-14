@@ -48,6 +48,12 @@ class StatusEffect{
         const message = `Эффект ${this.name} будет применен на ${this.target.name}. Осталось: ${this.duration} ход(а).`;
         this.target._log(message, `effect`);
     }
+    onApply(){
+
+    }
+    onRemove(){
+
+    }
 }
 class BurnEffect extends StatusEffect{
     constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
@@ -56,7 +62,6 @@ class BurnEffect extends StatusEffect{
     tick() {
         super.tick();
         this.target.takeDamage(this.power);
-
     }
 }
 

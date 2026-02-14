@@ -52,6 +52,7 @@ class Unit extends Subscriber{
        }
        else{
            this.activeEffects.push(effect);
+           effect.onApply();
            message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
        }
        this._log(message, `effect-start`);
@@ -59,9 +60,29 @@ class Unit extends Subscriber{
     async tickActiveEffects(){
         for(let effect of this.activeEffects){
             await delay(1000);
+            if (this.isDead) break;
             effect.tick();
+            if(effect.duration <= 0){
+                effect.onRemove();
+            }
         }
         this.activeEffects = this.activeEffects.filter((effect)=>effect.duration > 0);
+    }
+    removeRandomDebuff(){
+        const debuffs = this.activeEffects.filter((effect)=>effect.type=="DEBUFF");
+        let message = "";
+        if(debuffs.length == 0){
+            message = `Очищение не произошло. ${this.name} не имеет дебаффов`;
+        }
+        else{
+            const randomIndex = Math.floor(Math.random() * debuffs.length);
+            const id = debuffs[randomIndex].id;
+            const effectName = debuffs[randomIndex].name;
+            debuffs[randomIndex].onRemove();
+            this.activeEffects = this.activeEffects.filter((effect)=>effect.id !== id);
+            message = `${this.name} очищен(а) от ${effectName}.`;
+        }
+        this._log(message, `effect-cleaned`);
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {type, message});
