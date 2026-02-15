@@ -21,22 +21,46 @@ class Unit extends Subscriber{
         this.type = config.type;
     }
     takeDamage(damage){
-        const actualDamage = Math.max(0, damage - this.stats.def);
-        this.currentHp = clamp(this.currentHp - actualDamage, 0,this.maxHp);
-        if(this.currentHp == 0){
+        // Константа баланса.
+        // 50 значит, что при 50 защиты урон режется в 2 раза.
+        const ARMOR_COEFF = 50;
+
+        // 1. Считаем коэффициент прохождения урона (от 1.0 до 0.0)
+        // Если защита отрицательная (дебаффы), формула тоже сработает корректно (урон вырастет)
+        const damageMultiplier = ARMOR_COEFF / (ARMOR_COEFF + Math.max(0, this.stats.def));
+
+        // 2. Считаем итоговый урон
+        // Math.ceil гарантирует, что если удар был, хотя бы 1 хп снимется (если урон > 0)
+        let actualDamage = damage * damageMultiplier;
+
+
+        // Дальше твой стандартный код
+        this.currentHp = clamp(this.currentHp - actualDamage, 0, this.maxHp);
+        if (this.currentHp <= 0.01) {
+            this.currentHp = 0;
             this.isDead = true;
+            //this.onDeath(); // Если есть метод для событий смерти
         }
-        this._log(`${this.name} атакован(а) на ${actualDamage} урона.`, "player-attack");
+        this._log(`${this.name} получает ${Math.round(actualDamage)} урона.`, "player-attack");
         return actualDamage;
     }
     spendMp(amount){
         this.currentMp = clamp(this.currentMp - amount, 0, this.maxMp);
     }
-    heal(amount){
+    heal(amountPercent){
         const startHp = this.currentHp;
-        this.currentHp = clamp(this.currentHp + amount, 0, this.maxHp);
-        this._log(`${this.name} исцелен(а) на ${amount} единиц.`, "heal");
-        return this.currentHp - startHp;
+
+        // Считаем от МАКСИМУМА
+        const healValue = this.maxHp * (amountPercent / 100);
+
+        this.currentHp = clamp(this.currentHp + healValue, 0, this.maxHp);
+
+        const actualHealed = this.currentHp - startHp;
+
+        // В логе пишем реальную цифру
+        this._log(`${this.name} исцелен(а) на ${Math.round(actualHealed)} ед. здоровья.`, "heal");
+
+        return actualHealed;
     }
     addEffect(effect){
        const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);

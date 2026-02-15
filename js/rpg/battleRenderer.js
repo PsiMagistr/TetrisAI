@@ -29,6 +29,11 @@ class BattleRenderer extends Subscriber{
         this.ctx.fillRect(x, y, width, config.height);
         this.ctx.fillStyle = config.color;
         this.ctx.fillRect(x, y, width / max * current, config.height);
+        this.ctx.fillStyle = "#FFFFFF";
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = config.font;
+        this.ctx.fillText(`${Math.round(current)}/${max}`, x + width / 2, y + config.height / 2);
     }
     drawUnit(unit){
         if (!unit) return;

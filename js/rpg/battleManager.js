@@ -18,6 +18,14 @@ class BattleManager extends Subscriber{
         this.battleState = {
             resources:null,
         };
+        this.actions = {
+            ATTACK:(caster, target, power)=>{               ;
+                target.takeDamage(power);
+            },
+            HEAL:(caster, target, power)=>{
+                caster.heal(power);
+            }
+        };
         this.loop = this.loop.bind(this);
         this.eventOn(EVENTS.GAME.LIMIT_REACHED, this.handleBattleStart.bind(this));
         this.eventOn(EVENTS.GAME.START, this.stopBattle.bind(this));
@@ -235,27 +243,21 @@ class BattleManager extends Subscriber{
         }
         return result;
     }
-    onHit(spell, caster, target){
-        this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
-        const actions = {
-            ATTACK:()=>{
-               // this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
-                target.takeDamage(spell.power);
-            },
-            HEAL:()=>{
-                caster.heal(spell.power);
-            }
-        }
-        if(actions[spell.type]){
+    _applySpellMechanic(spell, caster, target, power){
+        if(this.actions[spell.type]){
             const config = spell.effect;
             const sprite = this.assetManager.getPictureByKey("SPELL_EFFECTS");
             let effect;
-            actions[spell.type]();
+            this.actions[spell.type](caster, target, power);
             if(config !== null){
                 effect = this.effectFactory.create(config, sprite, caster, target);
                 effect.target.addEffect(effect);
             }
         }
+    }
+    onHit(spell, caster, target){
+        this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
+        this._applySpellMechanic(spell, caster, target, spell.power);
         this._log("Конец хода", "system");
         caster.type == "player"?this._enemyTurn():this._playerTurn();
     }

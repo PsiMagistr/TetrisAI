@@ -1,7 +1,7 @@
 const GRAPHICS_CONFIG = {
     canvas:{
         width: 600,
-        height:200,
+        height:220,
     },
     units:{
         defaultSize:100,
@@ -12,14 +12,16 @@ const GRAPHICS_CONFIG = {
             color: "#e74c3c", //красный
             bgColor: "#2ecc71",  //Зеленый (>50%)
             width:100,
-            height:10,
+            height:15,
+            font:"10px Verdana",
         },
         mpBar:{
             offsetY:2,
             color: "#3498db", // Синий
             bgColor: "#2ecc71",
             width:100,
-            height:10,
+            height:15,
+            font:"10px Verdana",
         },
         fonts:{
             //name: "bold 14px 'Press Start 2P', sans-serif",
