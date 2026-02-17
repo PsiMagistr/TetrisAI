@@ -251,7 +251,7 @@ class OverlayEffect{
         const progress = this.elapsedTime / this.duration;
         // 3. Проверка окончания
         this.opacity = Math.abs(Math.sin(progress * Math.PI));
-        if (progress >= 3) {
+        if (progress >= 1) {
            this._finish();
 
         }

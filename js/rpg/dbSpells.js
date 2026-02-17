@@ -114,7 +114,39 @@ const SPELLS_DATABASE = {
             }
         },
     },
-
+    CHASTITY:{
+        id:"CHASTITY",
+        name:"Целомудрие",
+        type:"DEFENCE",
+        baseCost:{T:5, MP:10}, // Основа
+        basePower:1,
+        icon:"./assets/spells/icons/chastity.png",
+        animationChain:[
+            {
+                type:"overlayEffect",
+                startFrom:"caster",
+                duration:1000,
+                size:50,
+                color:"blue",
+                callback:null,
+                isUseCallback:true,
+            },
+        ],
+        modifiers:{
+            J:{
+                enabled:false,
+            },
+            Z:{
+                enabled:false,
+            },
+            I:{
+                enabled:false,
+            },
+            S: {
+                enabled: false,
+            }
+        },
+    }
 }
 
 

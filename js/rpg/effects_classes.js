@@ -14,6 +14,7 @@ class EffectFactory{
         const effectsList = {
             BURN:BurnEffect,
             REGEN:HealEffect,
+            BLEEDING:BleedingEffect,
         }
         const EffectClass = effectsList[config.id];
         if(!EffectClass) throw new Error("EffectClass not found");
@@ -33,10 +34,11 @@ class EffectFactory{
 }
 
 class StatusEffect{
-    constructor({id, name, sprite, target, power, duration, extension, iconIndex}){
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}){
         this.id = id;
         this.target = target;
         this.name = name;
+        this.type = type;
         this.power = power;
         this.duration = duration;
         this.extension = extension;
@@ -56,8 +58,18 @@ class StatusEffect{
     }
 }
 class BurnEffect extends StatusEffect{
-    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
-        super({id, name, sprite, target, power, duration, extension, iconIndex});
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, type, sprite, target, power, duration, extension, iconIndex});
+    }
+    tick() {
+        super.tick();
+        this.target.takeDamage(this.power);
+    }
+}
+
+class BleedingEffect extends StatusEffect{
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     tick() {
         super.tick();
@@ -66,8 +78,8 @@ class BurnEffect extends StatusEffect{
 }
 
 class HealEffect extends StatusEffect{
-    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
-        super({id, name, sprite, target, power, duration, extension, iconIndex});
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     tick() {
         super.tick();
@@ -76,11 +88,11 @@ class HealEffect extends StatusEffect{
 }
 
 class ShieldEffect extends StatusEffect{
-    constructor({id, name, sprite, target, power, duration, extension, iconIndex}) {
-        super({id, name, sprite, target, power, duration, extension, iconIndex});
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     onApply() {
-       this.target.removeRandomDebuff();
+       super.onApply();
        this.target.stats.def += this.power;
        if(this.power > 0) this.target._log(`Защита ${this.target.name} увеличена на ${this.power}`,`effect`);
     }

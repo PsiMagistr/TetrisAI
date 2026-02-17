@@ -8,6 +8,9 @@ class spellExecutor {
             },
             HEAL:(caster, target, power)=>{
                 caster.heal(power);
+            },
+            DEFENCE:(caster, target, power)=>{
+                caster.removeRandomDebuff();
             }
         }
     }

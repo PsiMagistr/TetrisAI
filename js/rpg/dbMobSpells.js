@@ -43,7 +43,7 @@ const MOB_SPELLS_DATABASE = {
             },
             Z:{
                 enabled:true,
-                effectId: "BURN",
+                effectId: "BLEEDING",
                 name:"Кровотечение",
                 target: "ENEMY", // <--- Явно указываем цель
                 type: "DEBUFF",
@@ -51,7 +51,7 @@ const MOB_SPELLS_DATABASE = {
                 baseDuration: 1,
                 effectPower: 0.2,
                 extension:false,
-                iconIndex:1,
+                iconIndex:3,
                 behavior:"toggle",
             },
             S:{
