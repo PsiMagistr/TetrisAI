@@ -51,6 +51,7 @@ const EVENTS = {
         SURRENDER:"battle:surrender",
         SPELL_SELECT:"spell_select",
         TOGGLE_MODIFIER_SPELL:"toggle_modifier_spell",
-        APPLAY_CAST: "applay_cast",
+        APPLY_CAST: "apply_cast",
+        DEATH:"death",
     }
 };

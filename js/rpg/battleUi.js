@@ -28,6 +28,7 @@ class BattleUi extends BaseUi{
         this.eventOn(EVENTS.UI.ADD_LOG, this._addLog.bind(this));
         this.eventOn(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, this.setInterfaceInteractivity.bind(this));
         this.eventOn(EVENTS.UI.CLEAR_LOG, this._clearLog.bind(this));
+        this.eventOn(EVENTS.BATTLE.DEATH, this._death.bind(this));
         this.ui.surrender.addEventListener("click", this.surrender.bind(this));
         this._initSpellContainerListener();
         this._initModifierContainerListener();
@@ -37,9 +38,6 @@ class BattleUi extends BaseUi{
         if(key !== "battle") return;
         const spellList = data.spellList;
         this.ui.statisticsText.textContent = `Линии:${data.lines} Уровень:${data.level} Очки:${data.score}`;
-       /* if (targetModal.log) {
-            targetModal.log.innerHTML = '<div class="log-entry system">--- Начало боя ---</div>';
-        }*/
         this._createSpellButton(spellList);
         this.ui.modBtns = Array.from(this.ui.modifiersPanel.querySelectorAll("button"));
         for(const btn of this.ui.modBtns){
@@ -232,7 +230,7 @@ class BattleUi extends BaseUi{
     }
     _btnCastListener(){
         this.ui.castBtn.addEventListener("click", (e)=>{
-            this.eventBus.emit(EVENTS.BATTLE.APPLAY_CAST,{});
+            this.eventBus.emit(EVENTS.BATTLE.APPLY_CAST,{});
         })
     }
     _updateResources(resources){
@@ -263,6 +261,9 @@ class BattleUi extends BaseUi{
         })
        this.resetInterface();
        this.ui.castBtn.disabled = true;
+    }
+    _death(){
+        this.setInterfaceInteractivity(false);
     }
     _clearLog(){
         if(!this.ui.log) throw new Error("Нет элемента лога");

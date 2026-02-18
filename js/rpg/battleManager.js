@@ -24,7 +24,8 @@ class BattleManager extends Subscriber{
         this.eventOn(EVENTS.BATTLE.SURRENDER, this.handleSurrender.bind(this));
         this.eventOn(EVENTS.BATTLE.SPELL_SELECT, this.spellSelect.bind(this));
         this.eventOn(EVENTS.BATTLE.TOGGLE_MODIFIER_SPELL, this.toggle_modifier.bind(this));
-        this.eventOn(EVENTS.BATTLE.APPLAY_CAST, this.handleCast.bind(this));
+        this.eventOn(EVENTS.BATTLE.APPLY_CAST, this.handleCast.bind(this));
+        this.eventOn(EVENTS.BATTLE.DEATH, this.death.bind(this));
     }
     startLoop(){
         if(!this.loopRequestID){
@@ -146,7 +147,7 @@ class BattleManager extends Subscriber{
         this.eventBus.emit(EVENTS.UI.UPDATE_SPELL_PREVIEW, spellPreview);
     }
     handleCast(){
-        if (!this.isPlayerTurn) return;
+        if (!this.isPlayerTurn || this.player.isDead || this.enemy.isDead) return;
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         console.log("!+++++++++++++++!");
         const spell = this.spellBuilder.build();
@@ -170,21 +171,20 @@ class BattleManager extends Subscriber{
         this.battleState.animations.push(animationContainer);
     }
     async _playerTurn(){
-        //setTimeout(()=>{
             await delay(1000);
             this._log("Ваш ход!", "system");
             await this.player.tickActiveEffects();
+            if(this.player.isDead || this.enemy.isDead) return;
             this.spellBuilder.reset();
             this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:true});
             this.isPlayerTurn = true;
-       // },1000)
     }
     async _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         await delay(1000);
-        //setTimeout(()=>{
             this._log("Ход противника!", "system");
             await this.enemy.tickActiveEffects();
+            if(this.player.isDead || this.enemy.isDead) return;
             const spellList = this.enemy.spellList;
             if (!spellList || spellList.length === 0) {
                 console.warn("У врага нет заклинаний! Пропуск хода.");
@@ -216,7 +216,6 @@ class BattleManager extends Subscriber{
             );
             this.battleState.animations.push(animationContainer);
             this.isPlayerTurn = false;
-       // },1000)
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {message, type});
@@ -235,21 +234,10 @@ class BattleManager extends Subscriber{
         }
         return result;
     }
-    /*_applySpellMechanic(spell, caster, target, power){
-        if(this.actions[spell.type]){
-            const config = spell.effect;
-            const sprite = this.assetManager.getPictureByKey("SPELL_EFFECTS");
-            let effect;
-            this.actions[spell.type](caster, target, power);
-            if(config !== null){
-                effect = this.effectFactory.create(config, sprite, caster, target);
-                effect.target.addEffect(effect);
-            }
-        }
-    }*/
     onHit(spell, caster, target){
         this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
         this.spellExecutor.applySpellMechanic(spell, caster, target, spell.power);
+        if(this.player.isDead || this.enemy.isDead) return;
         this._log("Конец хода", "system");
         caster.type == "player"?this._enemyTurn():this._playerTurn();
     }
@@ -259,5 +247,12 @@ class BattleManager extends Subscriber{
             animation.move(deltaTime);
         }
         this.battleState.animations = animations.filter(anim => !anim.isDeleted);
+    }
+    death(persona){
+        const finalText = persona.type == "enemy"?"ПОБЕДА!":"ПОРАЖЕНИЕ!";
+        this.player.clearAllEffects();
+        this.enemy.clearAllEffects();
+        this._log(`${persona.name} повержен(а)`, "system");
+        this._log(`${finalText}`, "system");
     }
 }

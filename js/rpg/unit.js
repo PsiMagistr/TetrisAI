@@ -24,7 +24,6 @@ class Unit extends Subscriber{
         // Константа баланса.
         // 50 значит, что при 50 защиты урон режется в 2 раза.
         const ARMOR_COEFF = 50;
-
         // 1. Считаем коэффициент прохождения урона (от 1.0 до 0.0)
         // Если защита отрицательная (дебаффы), формула тоже сработает корректно (урон вырастет)
         const damageMultiplier = ARMOR_COEFF / (ARMOR_COEFF + Math.max(0, this.stats.def));
@@ -39,8 +38,9 @@ class Unit extends Subscriber{
         if (this.currentHp <= 0.01) {
             this.currentHp = 0;
             this.isDead = true;
-            //this.onDeath(); // Если есть метод для событий смерти
+            this.onDeath(); // Если есть метод для событий смерти
         }
+        if(this.isDead) return;
         this._log(`${this.name} получает ${Math.round(actualDamage)} урона.`, "player-attack");
         return actualDamage;
     }
@@ -63,6 +63,7 @@ class Unit extends Subscriber{
         return actualHealed;
     }
     addEffect(effect){
+       if(this.isDead) return;
        const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);
        let message = "";
        if(activeEffect){
@@ -107,6 +108,12 @@ class Unit extends Subscriber{
             message = `${this.name} очищен(а) от ${effectName}.`;
         }
         this._log(message, `effect`);
+    }
+    onDeath(){
+        this.eventBus.emit(EVENTS.BATTLE.DEATH, this);
+    }
+    clearAllEffects(){
+        this.activeEffects = [];
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {type, message});
