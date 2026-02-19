@@ -48,7 +48,7 @@ const MOB_SPELLS_DATABASE = {
                 target: "ENEMY", // <--- Явно указываем цель
                 type: "DEBUFF",
                 cost:{Z:0},
-                baseDuration: 1,
+                baseDuration: 3,
                 effectPower: 0.2,
                 extension:false,
                 iconIndex:3,

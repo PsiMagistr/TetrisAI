@@ -166,7 +166,7 @@ class BattleRenderer extends Subscriber{
             const badgeY = y + size - badgeSize;
 
             // 2. Черный квадрат
-            this.ctx.fillStyle = "#000000"; // Или "rgba(0,0,0,0.8)" для легкой прозрачности
+            this.ctx.fillStyle = "#2F4F4F"; // Или "rgba(0,0,0,0.8)" для легкой прозрачности
             this.ctx.fillRect(badgeX, badgeY, badgeSize, badgeSize);
 
             // (Опционально) Тонкая белая рамка вокруг квадрата, чтобы отделить его от темной иконки
@@ -176,7 +176,7 @@ class BattleRenderer extends Subscriber{
 
             // 3. Белая цифра
             this.ctx.fillStyle = "#FFFFFF";
-            this.ctx.font = "bold 9px Verdana"; // Шрифт поменьше, чтобы влез в квадрат
+            this.ctx.font = "bold 10px Verdana"; // Шрифт поменьше, чтобы влез в квадрат
             this.ctx.textAlign = "center";
             this.ctx.textBaseline = "middle";
 
