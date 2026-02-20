@@ -15,6 +15,7 @@ class EffectFactory{
             BURN:BurnEffect,
             REGEN:HealEffect,
             BLEEDING:BleedingEffect,
+            PURITY:PurityEffect,
         }
         const EffectClass = effectsList[config.id];
         if(!EffectClass) throw new Error("EffectClass not found");
@@ -100,5 +101,21 @@ class ShieldEffect extends StatusEffect{
         super.onRemove();
         this.target.stats.def -= this.power;
         this.target._log(`Защита ${this.target.name} равна ${this.target.stats.def}`,`effect`);
+    }
+}
+
+class PurityEffect extends StatusEffect{
+    constructor({id, name, type, sprite, target, power, duration, extension, iconIndex}) {
+        super({id, name, type, sprite, target, power, duration, extension, iconIndex});
+    }
+    onApply() {
+        super.onApply();
+        this.target.stats.immunityToDebuffs = true;
+        this.target._log(`${this.target.name} получает иммунитет к дебаффам`,`effect`);
+    }
+    onRemove() {
+        super.onRemove();
+        this.target.stats.immunityToDebuffs = false;
+        this.target._log(`${this.target.name} утрачивает иммунитет к дебаффам`,`effect`);
     }
 }

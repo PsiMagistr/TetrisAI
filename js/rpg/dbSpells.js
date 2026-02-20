@@ -140,10 +140,24 @@ const SPELLS_DATABASE = {
                 enabled:false,
             },
             I:{
-                enabled:false,
+                enabled:true,
+                levels:[0, 1, 2],
+                costs:[{I:0, MP:0},{I:10, MP:0},{I:30, MP:0}],
+                behavior:"cycle",
             },
             S: {
-                enabled: false,
+                enabled: true,
+                name:"Невинность",
+                effectId: "PURITY",
+                target: "SELF", // <--- Цель: Игрок
+                type: "BUFF",
+                cost: {S:10,MP:10},
+                baseDuration: 1, // Висит 2 хода + бонусы от I
+                effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
+                iconIndex:4,
+                extension:false,
+                behavior:"toggle",
+                group:"effect",
             }
         },
     }

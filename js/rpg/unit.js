@@ -13,12 +13,14 @@ class Unit extends Subscriber{
         this.currentHp = config.currentHp ?? this.maxHp;
         this.maxMp = config.maxMp || 100;
         this.currentMp = config.currentMp ?? this.maxMp;
-        this.stats = config.stats || { atk: 10, def: 0 };
+        this.stats = config.stats || { atk: 10, def: 0, immunityToDebuffs:false};
         this.avatar = config.avatar;
         this.spellList = config.spellList || [];
         this.isDead = false;
+        this.immunityToDebuffs = false;
         this.activeEffects = [];
         this.type = config.type;
+
     }
     takeDamage(damage){
         // Константа баланса.
@@ -64,21 +66,26 @@ class Unit extends Subscriber{
     }
     addEffect(effect){
        if(this.isDead) return;
-       const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);
        let message = "";
-       if(activeEffect){
-           if(effect.extension){
-               activeEffect.duration = effect.duration;
-               message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
-           }
-           else{
-               message = `Эффект ${activeEffect.name} не может быть обновлен. Длительность ${activeEffect.duration} ход(а).`;
-           }
+       if(this.stats.immunityToDebuffs && effect.type === "DEBUFF"){
+           message = `Попытка наложения эффекта ${effect.name} на ${this.name} была отражена.`;
        }
        else{
-           this.activeEffects.push(effect);
-           effect.onApply();
-           message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+           const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);
+           if(activeEffect){
+               if(effect.extension){
+                   activeEffect.duration = effect.duration;
+                   message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
+               }
+               else{
+                   message = `Эффект ${activeEffect.name} не может быть обновлен. Длительность ${activeEffect.duration} ход(а).`;
+               }
+           }
+           else{
+               this.activeEffects.push(effect);
+               effect.onApply();
+               message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+           }
        }
        this._log(message, `effect-start`);
     }
@@ -97,7 +104,7 @@ class Unit extends Subscriber{
         const debuffs = this.activeEffects.filter((effect)=>effect.type=="DEBUFF");
         let message = "";
         if(debuffs.length == 0){
-            message = `Очищение не произошло. ${this.name} не имеет дебаффов`;
+            message = `${this.name} не имеет дебаффов`;
         }
         else{
             const randomIndex = Math.floor(Math.random() * debuffs.length);

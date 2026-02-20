@@ -6,7 +6,7 @@
             currentHp:100,
             baseMp:150,
             currentMp:150,
-            baseStats:{atk:2, def:0, speed:2},
+            baseStats:{atk:2, def:0, speed:2, immunityToDebuffs:false},
             spriteKey:"MISTRESS",
             offset:{x:50,y:40},
             spellList:["FIREBALL", "HEAL_LIGHT", "CHASTITY"],
