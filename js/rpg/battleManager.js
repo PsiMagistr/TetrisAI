@@ -263,6 +263,10 @@ class BattleManager extends Subscriber{
             color = "green";
             text = `HP +${value}`;
         }
+        else if(type === "DEBUFFER"){
+            color = "#CCCCCC";
+            text = `${value} отражен(о)`;
+        }
         const width = target.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
         const x = target.avatar.x + width / 2;
         const y = target.avatar.y + width / 2;

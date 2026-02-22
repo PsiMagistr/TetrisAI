@@ -76,8 +76,10 @@ class Unit extends Subscriber{
     addEffect(effect){
        if(this.isDead) return;
        let message = "";
+       let isDebuff = false
        if(this.stats.immunityToDebuffs && effect.type === "DEBUFF"){
            message = `Попытка наложения эффекта ${effect.name} на ${this.name} была отражена.`;
+           isDebuff = true;
        }
        else{
            const activeEffect = this.activeEffects.find(currenTEffect => currenTEffect.id === effect.id);
@@ -97,6 +99,13 @@ class Unit extends Subscriber{
            }
        }
        this._log(message, `effect-start`);
+       if(isDebuff){
+           this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+               target:this,
+               value:effect.name,
+               type:"DEBUFFER",
+           })
+       }
     }
     async tickActiveEffects(){
         for(let effect of this.activeEffects){
