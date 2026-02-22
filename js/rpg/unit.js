@@ -44,6 +44,11 @@ class Unit extends Subscriber{
         }
         if(this.isDead) return;
         this._log(`${this.name} получает ${Math.round(actualDamage)} урона.`, "player-attack");
+        this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            target:this,
+            value:actualDamage,
+            type:"DAMAGE",
+        })
         return actualDamage;
     }
     spendMp(amount){
@@ -61,7 +66,11 @@ class Unit extends Subscriber{
 
         // В логе пишем реальную цифру
         this._log(`${this.name} исцелен(а) на ${Math.round(actualHealed)} ед. здоровья.`, "heal");
-
+        this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            target:this,
+            value:actualHealed,
+            type:"HEAL",
+        })
         return actualHealed;
     }
     addEffect(effect){

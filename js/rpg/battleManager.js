@@ -26,6 +26,7 @@ class BattleManager extends Subscriber{
         this.eventOn(EVENTS.BATTLE.TOGGLE_MODIFIER_SPELL, this.toggle_modifier.bind(this));
         this.eventOn(EVENTS.BATTLE.APPLY_CAST, this.handleCast.bind(this));
         this.eventOn(EVENTS.BATTLE.DEATH, this.death.bind(this));
+        this.eventOn(EVENTS.BATTLE.FLOATING_TEXT, this.spawnFloatingText.bind(this));
     }
     startLoop(){
         if(!this.loopRequestID){
@@ -250,5 +251,27 @@ class BattleManager extends Subscriber{
         this.enemy.clearAllEffects();
         this._log(`${persona.name} повержен(а)`, "system");
         this._log(`${finalText}`, "system");
+    }
+    spawnFloatingText({target, value, type}){
+        let color = "white";
+        let text = `${value}`;
+        if(type === "DAMAGE"){
+            color = "red";
+            text = `HP -${value}`;
+        }
+        else if(type === "HEAL"){
+            color = "green";
+            text = `HP +${value}`;
+        }
+        const width = target.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
+        const x = target.avatar.x + width / 2;
+        const y = target.avatar.y + width / 2;
+        const floatAnim = new FloatingText({
+                x: x,
+                y: y,
+                text: text,
+                color: color,
+            });
+            this.battleState.animations.push(floatAnim);
     }
 }

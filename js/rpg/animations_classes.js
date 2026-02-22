@@ -272,4 +272,43 @@ class OverlayEffect{
         ctx.fillRect(this.x, this.y, this.size, this.size);
         ctx.restore();
     }
+
+}
+
+class FloatingText{
+    constructor({x, y, text, color}){
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.lifeTime = 4000;
+        this.elapsed = 0;
+        this.opacity = 1;
+        this.speedY = 0.05;
+        this.isDeleted = false;
+    }
+    move(deltaTime){
+        const dt = (deltaTime || 16);
+        this.elapsed += dt;
+        this.y -= this.speedY * dt;
+        this.opacity = 1 - this.elapsed / this.lifeTime;
+        if(this.elapsed >= this.lifeTime){
+            this.isDeleted = true;
+        }
+    }
+    draw(ctx){
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.font = "bold 20px 'Arial', cursive";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        // Обводка (чтобы было видно на любом фоне)
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "black";
+        ctx.strokeText(this.text, this.x, this.y);
+        // Заливка цветом
+        ctx.fillStyle = this.color;
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+    }
 }

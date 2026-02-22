@@ -53,5 +53,6 @@ const EVENTS = {
         TOGGLE_MODIFIER_SPELL:"toggle_modifier_spell",
         APPLY_CAST: "apply_cast",
         DEATH:"death",
+        FLOATING_TEXT:"floating_text",
     }
 };

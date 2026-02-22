@@ -61,76 +61,6 @@ class BattleRenderer extends Subscriber{
         this.drawBar(mpX, mpY, unit.maxMp, unit.currentMp, mpBarWidth, this.config.ui.mpBar);
         this.drawEffects(unit, mpX, mpY + this.config.ui.mpBar.height + 4, 25, "red");
     }
-    /*drawEffects(unit, x, y , size, color){
-        let drawnCount = 0;
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.font = "15px Arial";
-        for(let i = 0; i < unit.activeEffects.length; i++){
-            const iconIndex = unit.activeEffects[i].iconIndex;
-            const sprite = unit.activeEffects[i].sprite;
-            const duration = unit.activeEffects[i].duration;
-            const frameWidth = 214;
-            if(duration <= 0) continue;
-            this.ctx.drawImage(
-                sprite,
-                iconIndex * frameWidth,
-                0,
-                frameWidth,
-                frameWidth,
-                x + (size+1) * drawnCount, y, size, size);
-            this.ctx.fillStyle = "#000000";
-            this.ctx.fillText(duration, x + (size+1) * drawnCount + size / 2, y + size / 2);
-            drawnCount++;
-        }
-    }*/
-    /*drawEffects(unit, x, y, size, color) {
-        let drawnCount = 0;
-
-        // Настраиваем шрифт один раз перед циклом
-        this.ctx.font = "bold 12px Verdana"; // Жирный шрифт читается лучше
-        this.ctx.textAlign = 'right';      // Привязка к правому краю
-        this.ctx.textBaseline = 'bottom';  // Привязка к нижнему краю
-
-        for (let i = 0; i < unit.activeEffects.length; i++) {
-            const effect = unit.activeEffects[i];
-            const iconIndex = effect.iconIndex;
-            const sprite = effect.sprite;
-            const duration = effect.duration;
-            const frameWidth = 214;
-
-            if (duration <= 0) continue;
-
-            // Вычисляем X координату текущей иконки
-            const drawX = x + (size + 2) * drawnCount; // +2 для небольшого отступа между иконками
-
-            // 1. Рисуем спрайт
-            this.ctx.drawImage(
-                sprite,
-                iconIndex * frameWidth,
-                0,
-                frameWidth,
-                frameWidth,
-                drawX, y, size, size
-            );
-
-            // Координаты для текста (Правый нижний угол иконки)
-            // Добавляем небольшое смещение (например, +2px), чтобы цифра "сидела" плотно в углу
-            const textX = drawX + size + 2;
-            const textY = y + size + 2;
-
-            // 2. Рисуем ОБВОДКУ (Stroke) - это создает контраст
-            this.ctx.strokeStyle = "black";
-            this.ctx.lineWidth = 3; // Толщина обводки
-            this.ctx.lineJoin = "round"; // Сглаженные углы обводки
-            this.ctx.strokeText(duration, textX, textY);
-
-            // 3. Рисуем ЗАЛИВКУ (Fill) - сам белый текст
-            this.ctx.fillStyle = "white";
-            this.ctx.fillText(duration, textX, textY);
-            drawnCount++;
-        }
-    }*/
     drawEffects(unit, x, y, size, color) {
         let drawnCount = 0;
 
@@ -189,8 +119,15 @@ class BattleRenderer extends Subscriber{
     }
     drawAnimations(animations){
        for(const anim of animations){
-           if(typeof anim.active.draw !== 'function') continue;
-           anim.active.draw(this.ctx);
+          /* if(typeof anim.active.draw !== 'function') continue;
+           anim.active.draw(this.ctx);*/
+           if (anim.active && typeof anim.active.draw === 'function') {
+               anim.active.draw(this.ctx);
+           }
+           // Вариант 2: Это Простая анимация? (Есть свой метод draw)
+           else if (typeof anim.draw === 'function') {
+               anim.draw(this.ctx);
+           }
        }
     }
     draw({player, enemy, animations}){
