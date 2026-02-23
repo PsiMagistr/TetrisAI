@@ -1,4 +1,3 @@
-
 /* =========================================
    1. ШРИФТЫ И БАЗОВЫЕ НАСТРОЙКИ
    ========================================= */
@@ -18,13 +17,14 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden; /* Блокируем скролл страницы */
+    overflow: auto;
+    padding: 10px;
 }
 
-/* Кастомные скроллбары (Вебкит) */
+/* Кастомные скроллбары */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
     background: #111;
@@ -51,6 +51,9 @@ body {
     background-color: #333;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     position: relative;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
 }
 
 #game-board {
@@ -58,6 +61,8 @@ body {
     background-color: #000000;
     align-self: flex-start;
     display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 .side-panel {
@@ -111,7 +116,7 @@ body {
     border: 2px solid #777;
 }
 
-/* Общая кнопка игры (Старт/Меню) */
+/* Общая кнопка игры */
 .game-button {
     background-color: #27ae60;
     color: #fff;
@@ -137,7 +142,14 @@ body {
     border-bottom-width: 2px;
 }
 
-/* Панель ресурсов (Скрытая) */
+.game-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+    pointer-events: none;
+}
+
+/* --- ПАНЕЛЬ РЕСУРСОВ (Боковая) --- */
 #resources-container {
     width: 220px;
 }
@@ -146,6 +158,39 @@ body {
     text-align: left;
     line-height: 1.8;
 }
+
+/* Бейджи ресурсов (Общий стиль) */
+.res-badge {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    padding: 3px 6px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #fff;
+    display: inline-block;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    cursor: default;
+    white-space: nowrap;
+}
+
+/* Специфика для боковой панели */
+#main-resources-panel .res-badge {
+    display: block;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+/* Цвета ресурсов (Используются и в бейджах, и в кнопках) */
+.type-T { color: #ff6b6b; border-color: #ff6b6b; }
+.type-O { color: #51e980; border-color: #51e980; }
+.type-L { color: #54a0ff; border-color: #54a0ff; }
+.type-Z { color: #d980fa; border-color: #d980fa; }
+.type-I { color: #feca57; border-color: #feca57; }
+.type-J { color: #ff9f43; border-color: #ff9f43; }
+.type-MP { color: #3498db; border-color: #3498db; }
+.type-S { color: #DB7093; border-color: #DB7093; }
+
 
 /* =========================================
    3. ОВЕРЛЕЙ И МОДАЛЬНЫЕ ОКНА
@@ -167,7 +212,7 @@ body {
     display: none !important;
 }
 
-/* 3.1. Окно загрузки (Loader) */
+/* Окно загрузки */
 #loading-modal {
     display: flex;
     flex-direction: column;
@@ -210,7 +255,7 @@ body {
     animation: text-blink 1.5s infinite;
 }
 
-/* 3.2. Главное меню */
+/* Главное меню */
 #game-menu {
     background-color: #333;
     padding: 30px 40px;
@@ -238,8 +283,8 @@ body {
    ========================================= */
 #battle-modal {
     background-color: #2c3e50;
-    width: 1000px; /* Широкое окно 950 */
-    max-width: 98%;
+    width: 1000px;
+    max-width: 95%;
     border: 4px solid #f1c40f;
     border-radius: 10px;
     padding: 15px;
@@ -249,93 +294,38 @@ body {
     color: #fff;
     max-height: 98vh;
     overflow-y: auto;
-
-    /* Анимация появления */
     animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 /* Шапка */
-
 .battle-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Выравнивание по верху, чтобы при переносе строк всё стояло ровно */
-
-    background-color: #1a252f;
-    border-bottom: 2px solid #f1c40f;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    border-radius: 4px 4px 0 0;
-    /* Если ресурсов очень много, шапка может растянуться по высоте */
-    min-height: 40px;
-}
-
-.header-resources {
-    display: flex;
-    gap: 4px; /* Небольшой отступ между бейджами */
-    flex-wrap: wrap; /* ВАЖНО: Разрешаем перенос на следующую строку! */
-    justify-content: flex-end; /* Прижимаем вправо */
-    max-width: 75%; /* Не даем занять больше 75% ширины, чтобы не наехать на статистику */
-}
-
-.header-stats {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 10px;
-    color: #ecf0f1;
-    padding-top: 6px; /* Компенсация, чтобы текст был визуально по центру первой строки ресурсов */
-    white-space: nowrap; /* Чтобы текст не ломался */
-    margin-right: 20px;
-}
-
-.battle-resources-row {
-    display: flex;
-    flex-wrap: wrap; /* Если ресурсов много - перенос */
-    gap: 8px;
-    padding: 8px 12px;
-
-    background-color: rgba(0, 0, 0, 0.4); /* Темная полоса */
-    border: 1px solid #34495e;
-    border-radius: 4px;
-
-    margin-bottom: 10px; /* Отступ до списка заклинаний */
+    align-items: center;
+    border-bottom: 2px solid #34495e;
+    padding-bottom: 8px;
     min-height: 35px;
-    align-items: center;
 }
 
+.battle-header h3 { color: #f1c40f; font-size: 1em; white-space: nowrap; margin-right: 10px; }
 
-.res-badge {
-    font-family: 'Press Start 2P', cursive;
-    /* Уменьшаем шрифт и отступы, чтобы влезало больше */
-    font-size: 10px;
-    padding: 3px 5px;
-    width:100px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px solid #555;
-    border-radius: 3px;
-    color: #fff;
+/* Контейнер ресурсов в шапке (В ОДНУ СТРОКУ) */
+#battle-resources-container {
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* В одну строку */
+    gap: 6px;
+    overflow-x: auto; /* Горизонтальный скролл при переполнении */
+    max-width: 70%;
+    padding-bottom: 2px;
     align-items: center;
-    gap: 4px;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-    /* Чтобы не ломались внутри себя */
-    white-space: nowrap;
-    cursor: default;
 }
 
-
-
-/* Используем твои существующие цвета для подсветки */
-/* Текст и рамка красятся в цвет ресурса */
-.res-badge.type-T { border-color: #ff6b6b; color: #ff6b6b; }
-.res-badge.type-O { border-color: #51e980; color: #51e980; }
-.res-badge.type-L { border-color: #54a0ff; color: #54a0ff; }
-.res-badge.type-S { border-color: #DB7093; color: #DB7093; }
-.res-badge.type-Z { border-color: #d980fa; color: #d980fa; }
-.res-badge.type-I { border-color: #feca57; color: #feca57; }
-.res-badge.type-J { border-color: #ff9f43; color: #ff9f43; }
-.res-badge.type-MP { border-color: #3498db; color: #3498db; }
-/*.battle-header h3 { color: #f1c40f; font-size: 1em; }*/
-/*#statistics { font-size: 0.7em; color: #ecf0f1; }*/
+/* Бейджи в шапке */
+#battle-resources-container .res-badge {
+    width: auto;
+    margin: 0;
+}
 
 /* Арена */
 .battle-arena {
@@ -346,6 +336,7 @@ body {
     border: 3px solid #fff;
     position: relative;
     min-height: 220px;
+    flex-shrink: 0;
 }
 
 #battle-canvas {
@@ -356,7 +347,7 @@ body {
 }
 
 /* =========================================
-   5. ПАНЕЛЬ УПРАВЛЕНИЯ (Ряд под ареной)
+   5. ПАНЕЛЬ УПРАВЛЕНИЯ
    ========================================= */
 .battle-controls-row {
     display: flex;
@@ -370,7 +361,6 @@ body {
     border-radius: 4px;
 }
 
-/* Группа базовых кнопок (Слева) */
 .basic-controls-group {
     display: flex;
     gap: 10px;
@@ -382,7 +372,7 @@ body {
 .escape-btn { background-color: #7f8c8d; border-color: #95a5a6; font-size: 10px; padding: 10px; }
 .escape-btn:hover { background-color: #95a5a6; }
 
-/* Панель модификаторов (Справа) */
+/* Панель модификаторов */
 .modifiers-panel.top-bar {
     display: flex;
     align-items: center;
@@ -390,7 +380,6 @@ body {
     padding: 0;
 }
 
-/* Кнопки модификаторов */
 .mod-btn {
     padding: 8px 12px;
     font-size: 9px;
@@ -407,16 +396,13 @@ body {
 
 .mod-btn:hover { background: #4a6988; border-color: #fff; transform: translateY(-2px); }
 
-/* Состояние: Отключено логикой (зависимость) */
 .mod-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
     border-color: #333;
     background: #000;
-    pointer-events: none; /* Блокирует ховеры */
+    pointer-events: none;
 }
-
-/* Состояние: Недоступно в конфиге (Заглушка) */
 .mod-btn.unavailable {
     opacity: 0.1;
     background: #000;
@@ -426,8 +412,6 @@ body {
     pointer-events: none;
     box-shadow: none;
 }
-
-/* Состояние: Активно (Включено) */
 .mod-btn.active {
     border-color: #f1c40f;
     background: #d35400;
@@ -453,38 +437,32 @@ body {
 .battle-middle-row {
     display: flex;
     gap: 10px;
-    height: 250px; /* Увеличено для новых полей */
+    height: 220px;
     margin-bottom: 5px;
 }
 
-/* 6.1. Карточка заклинания (Слева) */
+/* Карточка заклинания */
 .spell-info-card {
-    flex: 0 0 30%; /* 30% ширины */
+    flex: 0 0 30%;
     background: #1a252f;
     border: 2px solid #34495e;
     border-radius: 4px;
-    padding: 8px;
+    padding: 10px;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    border-left: 2px solid #9b59b6;
-    margin-top: 4px;
+    gap: 8px;
     font-size: 10px;
 }
 
-/* Заголовок карточки */
 .card-header-row {
     display: flex;
     align-items: center;
     gap: 8px;
     border-bottom: 1px solid #f39c12;
-    padding-bottom: 4px;
-    margin-bottom: 2px;
+    padding-bottom: 6px;
 }
-/**/
 
-/**/
 .card-title {
     font-family: 'Press Start 2P', cursive;
     color: #f1c40f;
@@ -494,64 +472,55 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Строки данных */
 .card-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     line-height: 1.4;
-    background:#4a5d70;
-    color:#ffffff;
-}
-.power{
-    padding:5px;
 }
 .label { color: #95a5a6; }
+.value { color: #fff; font-weight: bold; font-family: Arial, sans-serif; font-size: 11px;}
 
-.value { color: #fff; font-weight: bold; font-family: Arial, sans-serif; font-size: 15px;}
-
-/* Блок эффекта */
 .effect-info-block {
     background: rgba(255, 255, 255, 0.05);
-    padding: 6px; /* Чуть больше padding */
+    padding: 6px;
     border-radius: 3px;
     display: flex;
     flex-direction: column;
-    gap: 4px; /* Отступы между строками */
+    gap: 4px;
     border-left: 2px solid #9b59b6;
-   /* margin-top: 2px;*/
-}
-.effect-header{
-    padding:8px;
+    margin-top: 0;
 }
 .effect-name { color:#ffffff; text-transform: uppercase; font-size: 9px; }
 .indent { padding-left: 8px; font-size: 9px; }
 
 /* Подвал с ценой */
-/*.card-footer-cost {
-    margin-top: auto;
-    border-top: 1px solid #555;
-    padding-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}*/
 .card-footer-cost {
     margin-top: auto;
     border-top: 1px solid #555;
-    padding-top: 6px;
+    padding-top: 8px;
     display: flex;
-    flex-direction: row; /* <--- ИЗМЕНЕНИЕ: Было column, стало row */
-    align-items: center; /* Выравнивание по вертикали по центру */
-    gap: 8px;            /* Отступ между словом "Цена:" и бейджами */
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 .cost-tags-list {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
 }
+/* Бейджи в карточке предпросмотра */
+.spell-cost-badge {
+    font-size: 8px;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+}
 
-/* 6.2. Лог боя (Справа) */
+/* Лог боя */
 .battle-log {
     flex: 1;
     height: 100%;
@@ -561,66 +530,32 @@ body {
     border-radius: 4px;
     overflow-y: auto;
     font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    font-size: 15px;
     line-height: 1.4;
     color: #ccc;
     text-align: left;
     box-shadow: inset 0 0 10px #000;
 }
-/*.log-entry { margin-bottom: 4px; border-bottom: 1px solid #222; }
-.log-entry.player-action { color: #3498db; }
-.log-entry.enemy-action { color: #e74c3c; }
-.log-entry.heal { color: #2ecc71; }
-.log-entry.system { color: #f1c40f; }*/
 
 .log-entry {
     padding: 4px 0;
     border-bottom: 1px solid #222;
-    font-family: 'Courier New', monospace; /* Моноширинный шрифт для читаемости */
-    font-size: 15px;
-    line-height: 1.4;
-    word-wrap: break-word;
     display: flex;
     align-items: center;
     gap: 5px;
 }
-.log-entry.player-action {
-    color: #5dade2; /* Мягкий голубой */
-}
-.log-entry.enemy-action {
-    color: #FF4500; /* Оранжевый */
-}
-
+.log-entry.player-action { color: #5dade2; }
 .log-entry.player-attack {
-    /* Яркий бирюзовый/циан */
     color: #00e5ff;
     font-weight: bold;
-
-    /* Вертикальная черта слева для выделения важных строк */
     border-left: 3px solid #00e5ff;
     padding-left: 8px;
-    /* Еле заметный фон, чтобы строка выделялась в массе текста */
     background: rgba(0, 229, 255, 0.05);
 }
-
-/* 2. Атака ВРАГА (Красный/Оранжевый) - Нас бьют */
-.log-entry.enemy-action {
-    color: #e74c3c; /* Красный */
-}
-
-/* 3. ЛЕЧЕНИЕ (Зеленый) */
-.log-entry.heal {
-    color: #2ecc71; /* Яркий зеленый */
-}
-
-.log-entry.effect {
-    color: #FFB6C1;
-}
-.log-entry.effect-start {
-    color: #DEB887;
-}
-
-/* 4. СИСТЕМА / ИНФО (Желтый/Золотой) - Начало боя, Ход */
+.log-entry.enemy-action { color: #FF4500; }
+.log-entry.heal { color: #2ecc71; }
+.log-entry.effect { color: #FFB6C1; }
+.log-entry.effect-start { color: #DEB887; }
 .log-entry.system {
     color: #f1c40f;
     font-weight: bold;
@@ -628,54 +563,7 @@ body {
     margin-top: 5px;
     padding-top: 5px;
 }
-
-/* 5. КРИТИЧЕСКИЙ УДАР (Яркий, жирный, с подсветкой) */
-.log-entry.critical {
-    color: #ff9f43; /* Оранжевый */
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(255, 159, 67, 0.4);
-    border-left: 3px solid #ff9f43; /* Полоска слева для акцента */
-    padding-left: 8px;
-    background: rgba(255, 159, 67, 0.1);
-}
-
-/* 6. ПОЛУЧЕНИЕ ЭФФЕКТА (Фиолетовый) - Бафф/Дебафф */
-.log-entry.effect-apply {
-    color: #d980fa; /* Светло-фиолетовый */
-    font-style: italic;
-}
-
-/* 7. УРОН ОТ ЭФФЕКТА (Темно-розовый) - Горение, Яд */
-.log-entry.effect-tick {
-    color: #ef5777; /* Розовый */
-    font-size: 10px; /* Чуть мельче, так как это спам */
-}
-
-/* 8. ПОБЕДА (Золотой, по центру) */
-.log-entry.victory {
-    color: #f1c40f;
-    font-size: 14px;
-    text-align: center;
-    font-weight: bold;
-    border: 2px solid #f1c40f;
-    background: rgba(241, 196, 15, 0.1);
-    margin: 10px 0;
-    padding: 10px;
-    font-family: 'Press Start 2P', cursive;
-}
-
-/* 9. ПОРАЖЕНИЕ (Серый, по центру) */
-.log-entry.defeat {
-    color: #95a5a6;
-    font-size: 14px;
-    text-align: center;
-    font-weight: bold;
-    border: 2px solid #95a5a6;
-    background: rgba(149, 165, 166, 0.1);
-    margin: 10px 0;
-    padding: 10px;
-    font-family: 'Press Start 2P', cursive;
-}
+.log-entry.effect-cleaned { color: #81ecec; }
 
 /* =========================================
    7. НИЖНЯЯ ПАНЕЛЬ (СПИСОК И КАСТ)
@@ -697,116 +585,42 @@ body {
     align-items: stretch;
 }
 
-/* Сетка кнопок */
-/*.spells-grid-container {
-    flex-grow: 1;
-    display: grid;
-
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-
-    grid-auto-rows: 50px;
-    gap: 8px;
-    overflow-y: auto;
-    padding: 8px;
-
-
-    background: #111;
-    border: 1px solid #444;
-    border-radius: 4px;
-    box-shadow: inset 0 0 10px #000;
-}*/
-
+/* СЕТКА КНОПОК (Восстановлен дизайн: Квадраты 110px) */
 .spells-grid-container {
     flex-grow: 1;
     display: grid;
-    /* Квадратные ячейки фиксированного размера (например, 50px) */
+    /* Квадратные ячейки 110px */
     grid-template-columns: repeat(auto-fill, 110px);
     grid-auto-rows: 110px;
-    gap: 8px; /* Расстояние между кнопками */
-
+    gap: 8px;
     overflow-y: auto;
     padding: 10px;
-    background: #111; /* Темный фон слота */
+    background: #111;
     border: 1px solid #444;
     border-radius: 4px;
     box-shadow: inset 0 0 10px #000;
 }
 
-
-/* Сама кнопка (Матовая плита) */
-/*.spell-btn {
-    background: linear-gradient(to bottom, #3a4a5a, #2c3e50);
-    border: 1px solid #566573;
-    box-shadow: 0 3px 0 #17202a;
-
-    border-radius: 4px;
-    color: #bdc3c7;
-    cursor: pointer;
-    font-family: 'Arial', cursive;
-    transition: all 0.1s ease;
-
-    width: 100%;
-    height: 100%;
-    position: relative;
-
-}*/
 /* КНОПКА (СЛОТ) */
 .spell-btn {
     width: 100%;
     height: 100%;
     padding: 0;
-
     display: flex;
+    flex-direction: column; /* Иконка сверху, текст снизу */
     justify-content: center;
     align-items: center;
-    position: relative; /* Для позиционирования цены в углу */
+    gap: 4px; /* Отступ */
+    position: relative; /* Для позиционирования цены */
 
     background: #2c3e50;
     border: 2px solid #566573;
     border-radius: 6px;
+    color: #bdc3c7;
     cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
     transition: all 0.1s ease;
 }
-.spell-btn:disabled,
-.spell-btn.disabled {
-    /* 1. Фон: Темный и плоский (убираем градиент) */
-    background: #151a20;
-
-    /* 2. Рамка: Темно-серая, почти невидимая */
-    border-color: #2c3e50;
-
-    /* 3. Текст: Тусклый */
-    color: #566573;
-
-    /* 4. Интерактивность: Запрет нажатия */
-    cursor: not-allowed;
-    pointer-events: none; /* Блокирует любые hover-эффекты и клики */
-
-    /* 5. Визуал: Полупрозрачность и отсутствие теней */
-    opacity: 0.6;
-    box-shadow: none;
-    transform: none !important; /* Запрещаем движение кнопки */
-}
-
-/* Гасим иконку внутри (делаем черно-белой и прозрачной) */
-.spell-btn:disabled .spell-icon,
-.spell-btn:disabled .spell-icon-img {
-    filter: grayscale(100%) opacity(0.4) drop-shadow(0 0 0 transparent);
-}
-
-/* Гасим бейджики с ценой внутри отключенной кнопки */
-.spell-btn:disabled .spell-btn-cost {
-    background: #222;       /* Серый фон */
-    border-color: #444;     /* Серая рамка */
-    color: #666;            /* Серый текст */
-}
-
-/*.spell-btn:hover {
-    background: linear-gradient(to bottom, #4a5d70, #34495e);
-    border-color: #808b96;
-    color: #fff;
-
-}*/
 
 .spell-btn:hover {
     border-color: #bdc3c7;
@@ -814,102 +628,101 @@ body {
     transform: scale(1.05);
 }
 
-/* Эффект нажатия */
 .spell-btn:active {
     transform: translateY(2px);
     box-shadow: 0 1px 0 #17202a;
     border-bottom: none;
 }
 
-/* Выбранная кнопка (Активная) */
-/*.spell-btn.selected {
-
-    background: linear-gradient(to bottom, #21618c, #154360);
-    border: 1px solid #d4ac0d;
-    box-shadow: 0 3px 0 #0e2e42, 0 0 8px rgba(212, 172, 13, 0.3);
-    color: #fcf3cf;
-    z-index: 2;
-}*/
-
 .spell-btn.selected {
     border-color: #f1c40f; /* Золотая рамка */
     background: #2c3e50;
     box-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
     z-index: 2;
+    color: #fff;
 }
-.spell-btn.selected .spell-name { color: #f1c40f;}
+.spell-btn.selected .spell-name { color: #f1c40f; }
 
-/*.spell-icon {
-    font-size: 18px;
-    width: 24px;
-    text-align: center;
-    opacity: 0.8;
-}*/
+.spell-btn:disabled, .spell-btn.disabled {
+    background: #151a20;
+    border-color: #2c3e50;
+    color: #566573;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none !important;
+}
 
+/* Иконка */
 .spell-icon {
-    font-size: 36px; /* Крупный размер */
+    font-size: 36px; /* Крупная иконка */
     filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
-    /* Если это будет картинка <img>: */
-    width: 100%; height: 100%; object-fit: contain;
+    text-align: center;
+    width: auto; height: auto;
+}
+.spell-icon-img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
+    pointer-events: none;
 }
 
-
-.spell-btn.selected .spell-icon {
-    opacity: 1;
-    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
-}
-
+/* Блок информации внутри кнопки */
 .spell-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
+    align-items: center;
     width: 100%;
     overflow: hidden;
 }
 
 .spell-name {
     font-size: 8px;
-    /*text-transform: uppercase;*/
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    text-align: center;
     letter-spacing: 0.5px;
     line-height: 1.2;
 }
 
-.spell-cost-container { display: flex; gap: 4px; }
-
-/* Бейджи цен */
-.spell-cost-badge {
-    font-size: 7px;
-    font-weight: normal;
-    padding: 2px 4px;
-    border-radius: 2px;
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: white; /* Дефолт */
+/* Бейджи цены внутри кнопки (В УГЛУ) */
+.spell-btn-costs-wrapper {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    display: flex;
+    flex-direction: column-reverse; /* Столбиком снизу вверх */
+    align-items: flex-end;
+    gap: 1px;
+    pointer-events: none;
 }
 
-/* Цвета ресурсов (Пастельные/Строгие) */
-.type-T { color: #e74c3c; }
-.type-O { color: #58d68d; }
-.type-L { color: #5dade2; }
-.type-Z { color: #af7ac5; }
-.type-S { color: #DB7093; }
-.type-I { color: #f7dc6f; }
-.type-J { color: #f0b27a; }
-.type-MP { color: #85c1e9; }
+.spell-btn-cost {
+    font-size: 9px; /* Читаемый шрифт */
+    font-weight: bold;
+    width: auto;
+    min-width: 30px;
+    text-align: center;
+    color: #fff;
+    background: rgba(0,0,0,0.85);
+    padding: 1px 3px;
+    border-radius: 3px;
+    border: 1px solid transparent; /* Место под цветную рамку */
+}
 
-
-.spell-btn-cost.type-T  { color: #ff6b6b; border: 1px solid #ff6b6b; } /* Красный */
-.spell-btn-cost.type-O  { color: #51e980; border: 1px solid #51e980; } /* Зеленый */
-.spell-btn-cost.type-L  { color: #54a0ff; border: 1px solid #54a0ff; } /* Синий */
-.spell-btn-cost.type-Z  { color: #d980fa; border: 1px solid #d980fa; } /* Фиолетовый */
-.spell-btn-cost.type-I  { color: #feca57; border: 1px solid #feca57; } /* Желтый */
-.spell-btn-cost.type-J  { color: #ff9f43; border: 1px solid #ff9f43; } /* Оранжевый */
-.spell-btn-cost.type-MP { color: #3498db; border: 1px solid #3498db; } /* Голубой */
+/* Конкретные цвета рамок бейджей цены внутри кнопок */
+.spell-btn-cost.type-T  { border-color: #ff6b6b; color: #ff6b6b; }
+.spell-btn-cost.type-O  { border-color: #51e980; color: #51e980; }
+.spell-btn-cost.type-L  { border-color: #54a0ff; color: #54a0ff; }
+.spell-btn-cost.type-Z  { border-color: #d980fa; color: #d980fa; }
+.spell-btn-cost.type-I  { border-color: #feca57; color: #feca57; }
+.spell-btn-cost.type-J  { border-color: #ff9f43; color: #ff9f43; }
+.spell-btn-cost.type-MP { border-color: #3498db; color: #3498db; }
+.spell-btn-cost.type-S  { border-color: #DB7093; color: #DB7093; }
 
 /* Кнопка КАСТ */
 .cast-wrapper-vertical {
@@ -935,56 +748,8 @@ body {
     box-shadow: 0 4px 0 #922b21;
 }
 
-.spell-icon-img {
-    width: 80%;       /* Занимает 80% размера кнопки */
-    height: 80%;
-    object-fit: contain; /* Сохраняет пропорции картинки */
-    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5)); /* Тень */
-    pointer-events: none; /* Клики проходят сквозь картинку */
-}
-
-/*.spell-btn-cost {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    font-size: 10px;
-    font-weight: bold;
-    color: #fff;
-    background: rgba(0,0,0,0.7);
-    padding: 1px 3px;
-    border-radius: 2px;
-    pointer-events: none;
-}*/
-
-.spell-btn-costs-wrapper {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-
-    display: flex;
-    flex-direction: column-reverse; /* Столбиком снизу вверх (чтобы не закрывать иконку по ширине) */
-    /* Или используй flex-direction: row; если хочешь в строчку */
-
-    align-items: flex-end; /* Прижать к правому краю */
-    gap: 1px; /* Расстояние между бейджами */
-    pointer-events: none;
-}
-
-.spell-btn-cost {
-    font-size: 10px;
-    font-weight: bold;
-    width:50px;
-    color: #fff;
-    background: rgba(0,0,0,0.8); /* Чуть темнее фон для читаемости */
-    padding: 1px 3px;
-    border-radius: 3px;
-    border: 1px solid transparent; /* Место под рамку */
-}
-
-
 .cast-btn:hover { background: #e74c3c; margin-top: 2px; box-shadow: 0 2px 0 #922b21; }
 .cast-btn:active { margin-top: 4px; box-shadow: none; }
-/* Состояние DISABLED (управляется атрибутом) */
 .cast-btn:disabled {
     background: #34495e;
     border-color: #2c3e50;
@@ -1026,5 +791,75 @@ body {
     100% { transform: scale(1); opacity: 1; }
 }
 
+/* =========================================
+   АДАПТИВНОСТЬ (RESPONSIVE DESIGN)
+   ========================================= */
 
+/* 1. Планшеты (до 1000px) */
+@media (max-width: 1000px) {
+    #battle-modal {
+        width: 98%;
+        padding: 10px;
+    }
 
+    .battle-middle-row {
+        flex-direction: column;
+        height: auto;
+        max-height: 350px;
+    }
+
+    .spell-info-card, .battle-log {
+        flex: 1;
+        width: 100%;
+        min-height: 120px;
+    }
+
+    .spell-info-card {
+        margin-bottom: 5px;
+    }
+}
+
+/* 2. Телефоны (до 600px) */
+@media (max-width: 600px) {
+    .tetris-wrapper {
+        padding: 10px;
+        gap: 15px;
+    }
+    .side-panel {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .battle-controls-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .basic-controls-group {
+        justify-content: space-between;
+    }
+
+    .modifiers-panel.top-bar {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .footer-actions.vertical-layout {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .cast-wrapper-vertical {
+        width: 100%;
+        height: 50px;
+        margin-top: 10px;
+    }
+
+    .spells-grid-container {
+        max-height: 200px;
+    }
+}

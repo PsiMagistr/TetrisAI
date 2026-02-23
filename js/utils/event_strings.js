@@ -54,5 +54,6 @@ const EVENTS = {
         APPLY_CAST: "apply_cast",
         DEATH:"death",
         FLOATING_TEXT:"floating_text",
+        BASIC_ATTACK:"basic_attack",
     }
 };

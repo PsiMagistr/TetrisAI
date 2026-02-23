@@ -52,10 +52,18 @@ class StatusEffect{
         this.target._log(message, `effect`);
     }
     onApply(){
-
+        this.target.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            target:this.target,
+            value:this.name,
+            type:"APPLY",
+        })
     }
     onRemove(){
-
+        this.target.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            target:this.target,
+            value:this.name,
+            type:"REMOVE",
+        })
     }
 }
 class BurnEffect extends StatusEffect{

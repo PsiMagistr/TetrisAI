@@ -7,6 +7,7 @@ class BattleUi extends BaseUi{
             statisticsText:"#statistics",
             log: "#battle-log",
             surrender:"#btn-surrender",
+            basicBtn:"#btn-basic-attack",
             previewName:"#preview-name",
             previewPower:"#preview-power",
             previewEffectsGrid:{
@@ -33,6 +34,7 @@ class BattleUi extends BaseUi{
         this._initSpellContainerListener();
         this._initModifierContainerListener();
         this._btnCastListener();
+        this._basicAttackListener();
     }
     _onOpenModal({key, data}){
         if(key !== "battle") return;
@@ -228,9 +230,15 @@ class BattleUi extends BaseUi{
     surrender(){
         this.eventBus.emit(EVENTS.BATTLE.SURRENDER,{});
     }
+
     _btnCastListener(){
         this.ui.castBtn.addEventListener("click", (e)=>{
             this.eventBus.emit(EVENTS.BATTLE.APPLY_CAST,{});
+        })
+    }
+    _basicAttackListener(){
+        this.ui.basicBtn.addEventListener("click", (e)=>{
+            this.eventBus.emit(EVENTS.BATTLE.BASIC_ATTACK,{});
         })
     }
     _updateResources(resources){
@@ -261,6 +269,8 @@ class BattleUi extends BaseUi{
         })
        this.resetInterface();
        this.ui.castBtn.disabled = true;
+       this.ui.basicBtn.disabled = !isActive;
+       this.ui.surrender.disabled = !isActive;
     }
     _death(){
         this.setInterfaceInteractivity(false);

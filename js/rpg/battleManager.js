@@ -27,6 +27,7 @@ class BattleManager extends Subscriber{
         this.eventOn(EVENTS.BATTLE.APPLY_CAST, this.handleCast.bind(this));
         this.eventOn(EVENTS.BATTLE.DEATH, this.death.bind(this));
         this.eventOn(EVENTS.BATTLE.FLOATING_TEXT, this.spawnFloatingText.bind(this));
+        this.eventOn(EVENTS.BATTLE.BASIC_ATTACK, this.handleBasicAttack.bind(this));
     }
     startLoop(){
         if(!this.loopRequestID){
@@ -214,6 +215,9 @@ class BattleManager extends Subscriber{
             this.battleState.animations.push(animationContainer);
             this.isPlayerTurn = false;
     }
+    handleBasicAttack(){
+        alert("HELLO WORLD!");
+    }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {message, type});
     }
@@ -266,6 +270,14 @@ class BattleManager extends Subscriber{
         else if(type === "DEBUFFER"){
             color = "#CCCCCC";
             text = `${value} отражен(о)`;
+        }
+        else if(type === "APPLY"){
+            color = "#CCCCCC";
+            text = `${value} наложен`;
+        }
+        else if(type === "REMOVE"){
+            color = "#CCCCCC";
+            text = `${value} удален`;
         }
         const width = target.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
         const x = target.avatar.x + width / 2;
