@@ -160,6 +160,40 @@ const SPELLS_DATABASE = {
                 group:"effect",
             }
         },
+    },
+    NATURE:{
+        id:"NATURE",
+        name:"Сила природы",
+        type:"NATURE",
+        baseCost:{T:5, MP:10, S:5}, // Основа
+        basePower:1,
+        icon:"./assets/spells/icons/nature_power.png",
+        animationChain:[
+            {
+                type:"overlayEffect",
+                startFrom:"caster",
+                duration:1000,
+                size:50,
+                color:"blue",
+                callback:null,
+                isUseCallback:true,
+            },
+        ],
+        modifiers:{
+            J:{
+                enabled:false,
+            },
+            Z:{
+                enabled:false,
+            },
+            I:{
+                enabled:false,
+
+            },
+            S: {
+                enabled: false,
+            }
+        },
     }
 }
 

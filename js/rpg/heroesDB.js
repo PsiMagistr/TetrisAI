@@ -9,7 +9,7 @@
             baseStats:{atk:2, def:0, speed:2, immunityToDebuffs:false},
             spriteKey:"MISTRESS",
             offset:{x:50,y:40},
-            spellList:["FIREBALL", "HEAL_LIGHT", "CHASTITY"],
+            spellList:["FIREBALL", "HEAL_LIGHT", "CHASTITY", "NATURE"],
         },
         MISTRESS:{
             name:"Елена",

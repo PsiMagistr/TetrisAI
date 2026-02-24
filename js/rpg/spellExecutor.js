@@ -1,7 +1,7 @@
 class spellExecutor {
     constructor(assetManager) {
         this.assetManager = assetManager;
-        this.effectFactory = new EffectFactory();;
+        this.effectFactory = new EffectFactory();
         this.actions = {
             ATTACK:(caster, target, power)=>{               ;
                 target.takeDamage(power);
@@ -11,6 +11,9 @@ class spellExecutor {
             },
             DEFENCE:(caster, target, power)=>{
                 caster.removeRandomDebuff();
+            },
+            NATURE:(caster, target, power)=>{
+                alert();
             }
         }
     }
