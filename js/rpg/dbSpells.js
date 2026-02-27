@@ -161,13 +161,23 @@ const SPELLS_DATABASE = {
             }
         },
     },
-    NATURE:{
-        id:"NATURE",
+    NATURE_POWER:{
+        id:"NATURE_POWER",
         name:"Сила природы",
-        type:"NATURE",
+        type:"EMPTY",
         baseCost:{T:5, MP:10, S:5}, // Основа
         basePower:1,
         icon:"./assets/spells/icons/nature_power.png",
+        fixedEffect:{  //Эффект пакетного типа
+            name:"Сила Природы",
+            effectId: "NATURE_POWER",
+            target: "SELF", // <--- Цель: Игрок
+            type: "BUFF",
+            baseDuration: 3, // Висит 2 хода + бонусы от I
+            effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
+            iconIndex:7,
+            extension:false,
+        },
         animationChain:[
             {
                 type:"overlayEffect",

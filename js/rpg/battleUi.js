@@ -118,13 +118,12 @@ class BattleUi extends BaseUi{
             // 2. ЦЕНА (Мини-бейдж)
             const costsWrapper = document.createElement("div");
             costsWrapper.className = "spell-btn-costs-wrapper";
-            for(const [key, val] of Object.entries(spell.baseCost)) {
+            /*for(const [key, val] of Object.entries(spell.baseCost)) {
                 const costBadge = document.createElement("span");
                 costBadge.className = `spell-btn-cost type-${key}`;
                 costBadge.textContent = `${key}:${val}`;
                 costsWrapper.appendChild(costBadge);
-               // btn.appendChild(costBadge);
-            }
+            }*/
             if (costsWrapper.children.length > 0) {
                 btn.appendChild(costsWrapper);
             }

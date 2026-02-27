@@ -12,6 +12,10 @@ function delay(ms){
     })
 }
 
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 class Subscriber{
     constructor(eventBus){
         this.eventBus = eventBus;

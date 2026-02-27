@@ -101,6 +101,19 @@ class SpellBuilder {
         }
     }
     _calculateActiveEffect(draft){
+        const dbEffect = draft.spellConfig.fixedEffect
+        if(dbEffect){
+           draft.activeEffect = {
+               id:dbEffect.effectId,
+               name:dbEffect.name,
+               type:dbEffect.type,
+               target:dbEffect.target,
+               duration:dbEffect.baseDuration,
+               power: Math.floor(draft.finalPower * (dbEffect.effectPower || 0)),
+               extension:dbEffect.extension || false,
+               iconIndex:dbEffect.iconIndex,
+           }
+        }
         const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
         if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
             if(draft.spellConfig.modifiers.I?.enabled){

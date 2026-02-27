@@ -13,7 +13,7 @@ class Unit extends Subscriber{
         this.currentHp = config.currentHp ?? this.maxHp;
         this.maxMp = config.maxMp || 100;
         this.currentMp = config.currentMp ?? this.maxMp;
-        this.stats = config.stats || { atk: 10, def: 0, immunityToDebuffs:false};
+        this.stats = config.stats || { atk: 10, def: 0, immunityToDebuffs:false,};
         this.avatar = config.avatar;
         this.spellList = config.spellList || [];
         this.isDead = false;
@@ -22,7 +22,7 @@ class Unit extends Subscriber{
         this.type = config.type;
 
     }
-    takeDamage(damage){
+    takeDamage(damage, context){
         // Константа баланса.
         // 50 значит, что при 50 защиты урон режется в 2 раза.
         const ARMOR_COEFF = 50;
@@ -43,7 +43,21 @@ class Unit extends Subscriber{
             this.onDeath(); // Если есть метод для событий смерти
         }
         if(this.isDead) return;
-        this._log(`${this.name} получает ${Math.round(actualDamage)} урона.`, "player-attack");
+        let message = "";
+        let text_type = "";
+        if(context.type === "SPELL"){
+            message = `${context.caster.name} применяет ${context.name} ${this.name} получает ${Math.round(actualDamage)} урона.`
+            text_type = "player-attack";
+        }
+        else if(context.type === "EFFECT"){
+            message = `Применяется эффект ${context.name}  ${this.name} получает ${Math.round(actualDamage)} урона.`
+            text_type = "effect";
+        }
+        else{
+            message = `${context.caster.name} использует ${context.name} ${this.name} получает ${Math.round(actualDamage)} урона.`;
+            text_type = "player-attack";
+        }
+        this._log(`${message}`, text_type);
         this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
             target:this,
             value:actualDamage,
@@ -54,18 +68,23 @@ class Unit extends Subscriber{
     spendMp(amount){
         this.currentMp = clamp(this.currentMp - amount, 0, this.maxMp);
     }
-    heal(amountPercent){
+    heal(amountPercent, context){
         const startHp = this.currentHp;
-
         // Считаем от МАКСИМУМА
         const healValue = this.maxHp * (amountPercent / 100);
 
         this.currentHp = clamp(this.currentHp + healValue, 0, this.maxHp);
 
         const actualHealed = this.currentHp - startHp;
-
+        let message = "";
+        if(context.type === "SPELL"){
+            message = `${this.name} применяет заклинание ${context.name} ${this.name} исцелен(а) на ${Math.round(actualHealed)} ед. здоровья)`;
+        }
+        else{
+            message = `Применяется эффект ${context.name}  ${this.name} исцелен(а) ${Math.round(actualHealed)} ед.`
+        }
         // В логе пишем реальную цифру
-        this._log(`${this.name} исцелен(а) на ${Math.round(actualHealed)} ед. здоровья.`, "heal");
+        this._log(message, "heal");
         this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
             target:this,
             value:actualHealed,

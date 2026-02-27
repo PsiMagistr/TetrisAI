@@ -215,8 +215,17 @@ class BattleManager extends Subscriber{
             this.battleState.animations.push(animationContainer);
             this.isPlayerTurn = false;
     }
-    handleBasicAttack(){
-        alert("HELLO WORLD!");
+    async handleBasicAttack(){//Топнуть ножкой.
+        const context = {
+            type:"BASIC",
+            name:"Удар ножкой",
+            caster:this.player,
+        }
+        this.enemy.takeDamage(1, context);
+        if( this.player.stats.naturePower){
+            this.player.spendMp(-5);
+        }
+        await this._enemyTurn();
     }
     _log(message, type){
         this.eventBus.emit(EVENTS.UI.ADD_LOG, {message, type});
@@ -236,7 +245,7 @@ class BattleManager extends Subscriber{
         return result;
     }
     onHit(spell, caster, target){
-        this._log(`${caster.name} применил(а) "${spell.name}". Входящая сила:${spell.power}`, `${caster.type}-action`);
+        //this._log(message, `${caster.type}-action`);
         this.spellExecutor.applySpellMechanic(spell, caster, target, spell.power);
         if(this.player.isDead || this.enemy.isDead) return;
         this._log("Конец хода", "system");
