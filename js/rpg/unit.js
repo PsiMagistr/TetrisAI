@@ -23,6 +23,9 @@ class Unit extends Subscriber{
 
     }
     takeDamage(damage, context){
+        console.log("Контекст")
+        console.log(context)
+        console.log("Конец контекста")
         // Константа баланса.
         // 50 значит, что при 50 защиты урон режется в 2 раза.
         const ARMOR_COEFF = 50;
@@ -33,10 +36,14 @@ class Unit extends Subscriber{
         // 2. Считаем итоговый урон
         // Math.ceil гарантирует, что если удар был, хотя бы 1 хп снимется (если урон > 0)
         let actualDamage = damage * damageMultiplier;
-
-
         // Дальше твой стандартный код
         this.currentHp = clamp(this.currentHp - actualDamage, 0, this.maxHp);
+        this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            name:context.name,
+            target:this,
+            value:actualDamage,
+            type:"DAMAGE",
+        });
         if (this.currentHp <= 0.01) {
             this.currentHp = 0;
             this.isDead = true;
@@ -58,11 +65,6 @@ class Unit extends Subscriber{
             text_type = "player-attack";
         }
         this._log(`${message}`, text_type);
-        this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
-            target:this,
-            value:actualDamage,
-            type:"DAMAGE",
-        })
         return actualDamage;
     }
     spendMp(amount){
@@ -86,6 +88,7 @@ class Unit extends Subscriber{
         // В логе пишем реальную цифру
         this._log(message, "heal");
         this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+            name:context.name,
             target:this,
             value:actualHealed,
             type:"HEAL",

@@ -42,7 +42,7 @@ const SPELLS_DATABASE = {
             I:{//Длительность
                 enabled:true,
                 levels:[0, 1, 2],
-                costs:[{I:0, MP:0},{I:10, MP:100},{I:30, MP:0}],
+                costs:[{I:0, MP:0},{I:10, MP:20},{I:30, MP:0}],
                 behavior:"cycle",
             },
             Z:{//Дебафф

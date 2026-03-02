@@ -299,7 +299,7 @@ class FloatingText{
     draw(ctx){
         ctx.save();
         ctx.globalAlpha = this.opacity;
-        ctx.font = "bold 20px 'Arial', cursive";
+        ctx.font = "bold 10px 'Arial', cursive";
         ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
         // Обводка (чтобы было видно на любом фоне)

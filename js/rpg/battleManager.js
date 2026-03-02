@@ -14,6 +14,7 @@ class BattleManager extends Subscriber{
         this.isPlayerTurn = true;
         this.loadingPromise = this.assetManager.preload(assetsConfig);
         this.animationSpellFactory = new AnimationSpellFactory();
+        this.floatingTextStorage = {};
         this.battleState = {
             resources:null,
         };
@@ -265,35 +266,55 @@ class BattleManager extends Subscriber{
         this._log(`${persona.name} повержен(а)`, "system");
         this._log(`${finalText}`, "system");
     }
-    spawnFloatingText({target, value, type}){
+    spawnFloatingText({name, target, value, type}){
         let color = "white";
         let text = `${value}`;
+        let offsetY = 0;
         if(type === "DAMAGE"){
             color = "red";
-            text = `HP -${value}`;
+            text = `${name} (HP -${value})`;
         }
         else if(type === "HEAL"){
             color = "green";
-            text = `HP +${value}`;
+            text = `${name} (HP +${value})`;
         }
         else if(type === "DEBUFFER"){
             color = "#CCCCCC";
             text = `${value} отражен(о)`;
+            offsetY = 15;
         }
         else if(type === "APPLY"){
             color = "#CCCCCC";
-            text = `${value} наложен`;
+            text = `Эффект ${value} наложен`;
+            offsetY = 15;
         }
         else if(type === "REMOVE"){
             color = "#CCCCCC";
-            text = `${value} удален`;
+            text = `Эффект ${value} удален`;
+            offsetY = -15;
         }
         const width = target.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
-        const x = target.avatar.x + width / 2;
-        const y = target.avatar.y + width / 2;
+        const baseX = target.avatar.x + width / 2;
+        const baseY = target.avatar.y + width / 2 - offsetY;
+       /* const unitId = target.id;
+        const now = Date.now();
+        const STACK_WINDOW = 50; // Время в мс, в течение которого сообщения группируются
+        const LINE_HEIGHT = 100;   // Шаг смещения вверх (пиксели)
+        if(!this.floatingTextStorage[unitId]){
+            this.floatingTextStorage[unitId] = {lastTime: 0, currentOffset: 0}
+        }
+        const stack = this.floatingTextStorage[unitId];
+        if (now - stack.lastTime < STACK_WINDOW) {
+            // Если сообщения идут очередью -> поднимаем выше
+            stack.currentOffset += LINE_HEIGHT;
+        } else {
+            // Если была пауза -> сбрасываем позицию в начало
+            stack.currentOffset = 0;
+        }
+        stack.lastTime = now;*/
         const floatAnim = new FloatingText({
-                x: x,
-                y: y,
+                x: baseX,
+                y: baseY,
                 text: text,
                 color: color,
             });
