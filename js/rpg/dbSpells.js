@@ -70,7 +70,7 @@ const SPELLS_DATABASE = {
         type:"HEAL",
         icon:"./assets/spells/icons/healing.png",
         baseCost: { O: 15, MP:30,},
-        basePower: 10,
+        basePower: 12,
         animationChain:[
             {
                 type:"overlayEffect",

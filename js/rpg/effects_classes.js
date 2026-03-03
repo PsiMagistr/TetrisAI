@@ -58,13 +58,17 @@ class StatusEffect{
             value:this.name,
             type:"APPLY",
         })
+        this.target._log(`Эффект ${this.name} наложен на ${this.target.name}. Длительность ${this.duration} ход(а)`,`effect-start`);
+
     }
-    onRemove(){
+    onRemove(isSlient = false){
         this.target.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
             target:this.target,
             value:this.name,
             type:"REMOVE",
         })
+        if(isSlient) return
+        this.target._log(`Эффект ${this.name} спал с ${this.target.name}.`,`effect`);
     }
 }
 class BurnEffect extends StatusEffect{
@@ -117,14 +121,15 @@ class ShieldEffect extends StatusEffect{
         super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     onApply() {
-       super.onApply();
        this.target.stats.def += this.power;
-       if(this.power > 0) this.target._log(`Защита ${this.target.name} увеличена на ${this.power}`,`effect`);
+       //if(this.power > 0) this.target._log(`Защита ${this.target.name} увеличена на ${this.power}`,`effect`);
+       super.onApply();
     }
-    onRemove() {
-        super.onRemove();
+    onRemove(isSlient = false) {
         this.target.stats.def -= this.power;
-        this.target._log(`Защита ${this.target.name} равна ${this.target.stats.def}`,`effect`);
+        super.onRemove();
+        //if(isSlient) return
+        //this.target._log(`Защита ${this.target.name} равна ${this.target.stats.def}`,`effect`);
     }
 }
 
@@ -133,13 +138,14 @@ class PurityEffect extends StatusEffect{
         super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     onApply() {
-        super.onApply();
         this.target.stats.immunityToDebuffs = true;
+        super.onApply();
         //this.target._log(`${this.target.name} получает иммунитет к дебаффам`,`effect`);
     }
-    onRemove() {
-        super.onRemove();
+    onRemove(isSlient = false) {
         this.target.stats.immunityToDebuffs = false;
+        super.onRemove(isSlient);
+        //if(isSlient) return;
         //this.target._log(`${this.target.name} утрачивает иммунитет к дебаффам`,`effect`);
     }
 }
@@ -149,11 +155,11 @@ class NaturePowerEffect extends StatusEffect{
         super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     onApply() {
-        super.onApply();
         this.target.stats.naturePower = true;
+        super.onApply();
     }
-    onRemove() {
-        super.onRemove();
+    onRemove(isSlient = false) {
         this.target.stats.naturePower = false;
+        super.onRemove(isSlient);
     }
 }

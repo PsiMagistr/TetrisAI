@@ -17,7 +17,6 @@ class Unit extends Subscriber{
         this.avatar = config.avatar;
         this.spellList = config.spellList || [];
         this.isDead = false;
-        this.immunityToDebuffs = false;
         this.activeEffects = [];
         this.type = config.type;
 
@@ -41,30 +40,22 @@ class Unit extends Subscriber{
         this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
             name:context.name,
             target:this,
-            value:actualDamage,
+            value:Math.round(actualDamage),
             type:"DAMAGE",
         });
+        let logData;
+        if(context.type === "SPELL"){
+            logData = logMessages.battle.spell.damage(context.caster.name, this.name, context.name, Math.round(actualDamage));
+        }
+        else if(context.type === "EFFECT"){
+            logData = logMessages.battle.effect.damage(this.name, context.name, Math.round(actualDamage));
+        }
+        this._log(logData.message, logData.type);
         if (this.currentHp <= 0.01) {
             this.currentHp = 0;
             this.isDead = true;
             this.onDeath(); // Если есть метод для событий смерти
         }
-        if(this.isDead) return;
-        let message = "";
-        let text_type = "";
-        if(context.type === "SPELL"){
-            message = `${context.caster.name} применяет ${context.name} ${this.name} получает ${Math.round(actualDamage)} урона.`
-            text_type = "player-attack";
-        }
-        else if(context.type === "EFFECT"){
-            message = `Применяется эффект ${context.name}  ${this.name} получает ${Math.round(actualDamage)} урона.`
-            text_type = "effect";
-        }
-        else{
-            message = `${context.caster.name} использует ${context.name} ${this.name} получает ${Math.round(actualDamage)} урона.`;
-            text_type = "player-attack";
-        }
-        this._log(`${message}`, text_type);
         return actualDamage;
     }
     spendMp(amount){
@@ -74,19 +65,17 @@ class Unit extends Subscriber{
         const startHp = this.currentHp;
         // Считаем от МАКСИМУМА
         const healValue = this.maxHp * (amountPercent / 100);
-
         this.currentHp = clamp(this.currentHp + healValue, 0, this.maxHp);
-
         const actualHealed = this.currentHp - startHp;
-        let message = "";
+        let logData;
         if(context.type === "SPELL"){
-            message = `${this.name} применяет заклинание ${context.name} ${this.name} исцелен(а) на ${Math.round(actualHealed)} ед. здоровья)`;
+            logData =  logMessages.battle.spell.heal(this.name, context.name, Math.round(actualHealed));
         }
         else{
-            message = `Применяется эффект ${context.name}  ${this.name} исцелен(а) ${Math.round(actualHealed)} ед.`
+           logData =  logMessages.battle.effect.heal(this.name, context.name, Math.round(actualHealed));
         }
         // В логе пишем реальную цифру
-        this._log(message, "heal");
+        this._log(logData.message, logData.type);
         this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
             name:context.name,
             target:this,
@@ -117,10 +106,12 @@ class Unit extends Subscriber{
            else{
                this.activeEffects.push(effect);
                effect.onApply();
-               message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
+               //message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
            }
        }
-       this._log(message, `effect-start`);
+       if(message){
+           this._log(message, `effect-start`);
+       }
        if(isDebuff){
            this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
                target:this,
@@ -152,7 +143,7 @@ class Unit extends Subscriber{
             const effectName = debuffs[randomIndex].name;
             debuffs[randomIndex].onRemove();
             this.activeEffects = this.activeEffects.filter((effect)=>effect.id !== id);
-            message = `${this.name} очищен(а) от ${effectName}.`;
+            //message = `${this.name} очищен(а) от ${effectName}.`;
         }
         this._log(message, `effect`);
     }
