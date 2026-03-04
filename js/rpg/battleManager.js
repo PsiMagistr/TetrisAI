@@ -126,10 +126,11 @@ class BattleManager extends Subscriber{
                      })),
             }
         });
-        this.checkPlayerTurn()?this._playerTurn():this._enemyTurn();
         this.eventBus.emit(EVENTS.RESOURCES.UPDATE, this.resourceManager.getResources());
         this.eventBus.emit(EVENTS.UI.CLEAR_LOG, {});
-        this._log("Бой начался", "system");
+        const logData = logMessages.battle.system.startBattle();
+        this._log(logData.message, logData.type);
+        this.checkPlayerTurn()? this._playerTurn():this._enemyTurn();
         this.startLoop(); //Стартуем игровой цикл
     }
     handleSurrender(){
@@ -175,7 +176,8 @@ class BattleManager extends Subscriber{
     }
     async _playerTurn(){
             await delay(1000);
-            this._log("Ваш ход!", "system");
+            const logData = logMessages.battle.system.heroTurn();
+            this._log(logData.message, logData.type);
             await this.player.tickActiveEffects();
             if(this.player.isDead || this.enemy.isDead) return;
             this.spellBuilder.reset();
@@ -185,36 +187,37 @@ class BattleManager extends Subscriber{
     async _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         await delay(1000);
-            this._log("Ход противника!", "system");
-            await this.enemy.tickActiveEffects();
-            if(this.player.isDead || this.enemy.isDead) return;
-            const spellList = this.enemy.spellList;
-            if (!spellList || spellList.length === 0) {
-                console.warn("У врага нет заклинаний! Пропуск хода.");
-                this._playerTurn();
-                return;
-            }
-            const randomId = spellList[Math.floor(Math.random() * spellList.length)];
-            const aiBuilder = new SpellBuilder(null, this.enemy);
-            aiBuilder.setBaseSpell(randomId);
-            aiBuilder.toggleModifier("Z");
-            const enemySpell = aiBuilder.build();
-            if(!enemySpell.isValid){
-                this._log(`${this.enemy.name} пытается использовать ${enemySpell.name}, но не хватает манны.`, "enemy-action");
-                this._playerTurn();
-                return;
-            }
-            const cost = {...enemySpell.totalCost};
-            const mp = cost.MP;
-            this.enemy.spendMp(mp);
-            const animationContainer = this.animationSpellFactory.createSpellAnimation(
-                this.enemy,       // Caster
-                this.player,      // Target
-                enemySpell.animationChain || [], // Цепочка из базы данных
-                this.onHit.bind(this, enemySpell, this.enemy, this.player) // Коллбэк
-            );
-            this.battleState.animations.push(animationContainer);
-            this.isPlayerTurn = false;
+        const logData = logMessages.battle.system.enemyTurn();
+        this._log(logData.message, logData.type);
+        await this.enemy.tickActiveEffects();
+        if(this.player.isDead || this.enemy.isDead) return;
+        const spellList = this.enemy.spellList;
+        if (!spellList || spellList.length === 0) {
+            console.warn("У врага нет заклинаний! Пропуск хода.");
+            this._playerTurn();
+            return
+        }
+        const randomId = spellList[Math.floor(Math.random() * spellList.length)];
+        const aiBuilder = new SpellBuilder(null, this.enemy);
+        aiBuilder.setBaseSpell(randomId);
+        aiBuilder.toggleModifier("Z");
+        const enemySpell = aiBuilder.build();
+        if(!enemySpell.isValid){
+            this._log(`${this.enemy.name} пытается использовать ${enemySpell.name}, но не хватает манны.`, "enemy-action");
+            this._playerTurn();
+            return;
+        }
+        const cost = {...enemySpell.totalCost};
+        const mp = cost.MP;
+        this.enemy.spendMp(mp);
+        const animationContainer = this.animationSpellFactory.createSpellAnimation(
+            this.enemy,       // Caster
+            this.player,      // Target
+            enemySpell.animationChain || [], // Цепочка из базы данных
+            this.onHit.bind(this, enemySpell, this.enemy, this.player) // Коллбэк
+        );
+        this.battleState.animations.push(animationContainer);
+        this.isPlayerTurn = false;
     }
     async handleBasicAttack(){//Топнуть ножкой.
         const context = {
@@ -246,10 +249,10 @@ class BattleManager extends Subscriber{
         return result;
     }
     onHit(spell, caster, target){
-        //this._log(message, `${caster.type}-action`);
         this.spellExecutor.applySpellMechanic(spell, caster, target, spell.power);
         if(this.player.isDead || this.enemy.isDead) return;
-        this._log("Конец хода", "system");
+        const logData = logMessages.battle.system.endTurn();
+        this._log(logData.message, logData.type);
         caster.type == "player"?this._enemyTurn():this._playerTurn();
     }
     update(deltaTime){
@@ -263,7 +266,8 @@ class BattleManager extends Subscriber{
         const finalText = persona.type == "enemy"?"ПОБЕДА!":"ПОРАЖЕНИЕ!";
         this.player.clearAllEffects();
         this.enemy.clearAllEffects();
-        this._log(`${persona.name} повержен(а)`, "system");
+        const logData = logMessages.battle.system.death(persona.name);
+        this._log(logData.message, logData.type);
         this._log(`${finalText}`, "system");
     }
     spawnFloatingText({name, target, value, type}){

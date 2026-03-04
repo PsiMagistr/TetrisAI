@@ -86,10 +86,10 @@ class Unit extends Subscriber{
     }
     addEffect(effect){
        if(this.isDead) return;
-       let message = "";
+       let logData = "";
        let isDebuff = false
        if(this.stats.immunityToDebuffs && effect.type === "DEBUFF"){
-           message = `Попытка наложения эффекта ${effect.name} на ${this.name} была отражена.`;
+           logData = logMessages.battle.effect.onAttemptAtImposition(this.name, effect.name);
            isDebuff = true;
        }
        else{
@@ -97,20 +97,19 @@ class Unit extends Subscriber{
            if(activeEffect){
                if(effect.extension){
                    activeEffect.duration = effect.duration;
-                   message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
+                   //message = `Эффект ${activeEffect.name} обновлен. Длительность ${activeEffect.duration} ход(а).`;
                }
                else{
-                   message = `Эффект ${activeEffect.name} не может быть обновлен. Длительность ${activeEffect.duration} ход(а).`;
+                  // message = `Эффект ${activeEffect.name} не может быть обновлен. Длительность ${activeEffect.duration} ход(а).`;
                }
            }
            else{
                this.activeEffects.push(effect);
                effect.onApply();
-               //message = `Эффект ${effect.name} наложен на ${this.name}. Длительность ${effect.duration} ход(а).`;
            }
        }
-       if(message){
-           this._log(message, `effect-start`);
+       if(logData.message){
+           this._log(logData.message, logData.type);
        }
        if(isDebuff){
            this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {

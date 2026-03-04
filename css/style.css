@@ -554,8 +554,9 @@ body {
 }
 .log-entry.enemy-action { color: #FF4500; }
 .log-entry.heal { color: #2ecc71; }
-.log-entry.effect { color: #FFB6C1; }
-.log-entry.effect-start { color: #DEB887; }
+.log-entry.effect { color: #FFB6C1; font-style: italic}
+.log-entry.effect-heal { color: #2ecc71; font-style: italic}
+.log-entry.effect-info { color: #DEB887; font-style: italic}
 .log-entry.system {
     color: #f1c40f;
     font-weight: bold;

@@ -49,8 +49,6 @@ class StatusEffect{
     }
     tick(){
         this.duration--;
-        //const message = `Эффект ${this.name} будет применен на ${this.target.name}. Осталось: ${this.duration} ход(а).`;
-        //this.target._log(message, `effect`);
     }
     onApply(){
         this.target.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
@@ -58,7 +56,8 @@ class StatusEffect{
             value:this.name,
             type:"APPLY",
         })
-        this.target._log(`Эффект ${this.name} наложен на ${this.target.name}. Длительность ${this.duration} ход(а)`,`effect-start`);
+        const logData = logMessages.battle.effect.onApply(this.target.name, this.name, this.duration);
+        this.target._log(logData.message, logData.type);
 
     }
     onRemove(isSlient = false){
@@ -68,7 +67,8 @@ class StatusEffect{
             type:"REMOVE",
         })
         if(isSlient) return
-        this.target._log(`Эффект ${this.name} спал с ${this.target.name}.`,`effect`);
+        const logData = logMessages.battle.effect.onRemove(this.target.name, this.name);
+        this.target._log(logData.message, logData.type);
     }
 }
 class BurnEffect extends StatusEffect{
@@ -128,8 +128,6 @@ class ShieldEffect extends StatusEffect{
     onRemove(isSlient = false) {
         this.target.stats.def -= this.power;
         super.onRemove();
-        //if(isSlient) return
-        //this.target._log(`Защита ${this.target.name} равна ${this.target.stats.def}`,`effect`);
     }
 }
 
@@ -140,13 +138,10 @@ class PurityEffect extends StatusEffect{
     onApply() {
         this.target.stats.immunityToDebuffs = true;
         super.onApply();
-        //this.target._log(`${this.target.name} получает иммунитет к дебаффам`,`effect`);
     }
     onRemove(isSlient = false) {
         this.target.stats.immunityToDebuffs = false;
         super.onRemove(isSlient);
-        //if(isSlient) return;
-        //this.target._log(`${this.target.name} утрачивает иммунитет к дебаффам`,`effect`);
     }
 }
 
