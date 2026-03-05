@@ -21,6 +21,14 @@ const logMessages = {
                 message:`${personaName} повержен(а)`,
                 type:`system`,
             }),
+            victory:()=>({
+                message:`ПОБЕДА`,
+                type:`system`,
+            }),
+            fail:()=>({
+                message:`ПОРАЖЕНИЕ`,
+                type:`system`,
+            }),
         },
         spell:{
             damage:(casterName, targetName, spellName, damage)=>({
@@ -30,6 +38,20 @@ const logMessages = {
             heal:(targetName, spellName, actualHealed)=>({
                 message:`${targetName} применяет ${spellName} ${targetName} исцелен(а) на ${Math.round(actualHealed)} ед.`,
                 type:"heal",
+            }),
+            cleanseAllDebuffs:(targetName, spellName)=>({
+                message:`${targetName} применяет ${spellName}. Он(а)  омыт(а) от порчи.`,
+                type:"system",
+            }),
+            noDebuffs:(targetName, spellName)=>({
+                message:`${targetName} применяет ${spellName}. Нет дебаффов.`,
+                type:"system",
+            }),
+        },
+        basic:{
+            kick:(casterName, targetName, spellName, damage)=>({
+                message:`${casterName} применяет ${spellName}. ${targetName} получает ${Math.round(damage)} урона.`,
+                type:"player-attack",
             }),
         },
         effect:{

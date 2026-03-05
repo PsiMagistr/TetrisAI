@@ -50,6 +50,9 @@ class Unit extends Subscriber{
         else if(context.type === "EFFECT"){
             logData = logMessages.battle.effect.damage(this.name, context.name, Math.round(actualDamage));
         }
+        else if(context.type === "BASIC"){
+            logData = logMessages.battle.basic.kick(context.caster.name, this.name, context.name, Math.round(actualDamage));
+        }
         this._log(logData.message, logData.type);
         if (this.currentHp <= 0.01) {
             this.currentHp = 0;
@@ -142,9 +145,20 @@ class Unit extends Subscriber{
             const effectName = debuffs[randomIndex].name;
             debuffs[randomIndex].onRemove();
             this.activeEffects = this.activeEffects.filter((effect)=>effect.id !== id);
-            //message = `${this.name} очищен(а) от ${effectName}.`;
         }
         this._log(message, `effect`);
+    }
+    cleanseAllDebuffs(spellName){
+        const debuffs = this.activeEffects.filter((effect)=>effect.type=="DEBUFF");
+        let logData = logMessages.battle.spell.cleanseAllDebuffs(this.name, spellName)
+        if(debuffs.length == 0){
+            logData = logMessages.battle.spell.noDebuffs(this.name, spellName);
+        }
+        else{
+            debuffs.forEach((effect)=>effect.onRemove(true));
+            this.activeEffects = this.activeEffects.filter((effect)=>effect.type !== "DEBUFF");
+        }
+        this._log(logData.message, logData.type);
     }
     onDeath(){
         this.eventBus.emit(EVENTS.BATTLE.DEATH, this);

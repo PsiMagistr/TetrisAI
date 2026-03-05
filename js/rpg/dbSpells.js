@@ -121,6 +121,16 @@ const SPELLS_DATABASE = {
         baseCost:{T:5, MP:10}, // Основа
         basePower:1,
         icon:"./assets/spells/icons/chastity.png",
+        fixedEffect:{
+            name:"Невинность",
+            effectId: "PURITY",
+            target: "SELF", // <--- Цель: Игрок
+            type: "BUFF",
+            baseDuration: 2, // Висит 2 хода + бонусы от I
+            effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
+            iconIndex:4,
+            extension:false,
+        },
         animationChain:[
             {
                 type:"overlayEffect",
@@ -140,14 +150,14 @@ const SPELLS_DATABASE = {
                 enabled:false,
             },
             I:{
-                enabled:true,
-                levels:[0, 1, 2],
+                enabled:false,
+               /* levels:[0, 1, 2],
                 costs:[{I:0, MP:0},{I:10, MP:0},{I:30, MP:0}],
-                behavior:"cycle",
+                behavior:"cycle",*/
             },
             S: {
-                enabled: true,
-                name:"Невинность",
+                enabled: false,
+                /*name:"Невинность",
                 effectId: "PURITY",
                 target: "SELF", // <--- Цель: Игрок
                 type: "BUFF",
@@ -157,7 +167,7 @@ const SPELLS_DATABASE = {
                 iconIndex:4,
                 extension:false,
                 behavior:"toggle",
-                group:"effect",
+                group:"effect",*/
             }
         },
     },

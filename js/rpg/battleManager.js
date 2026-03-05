@@ -263,12 +263,12 @@ class BattleManager extends Subscriber{
         this.battleState.animations = animations.filter(anim => !anim.isDeleted);
     }
     death(persona){
-        const finalText = persona.type == "enemy"?"ПОБЕДА!":"ПОРАЖЕНИЕ!";
+        const final = persona.type == "enemy"?logMessages.battle.system.victory():logMessages.battle.system.fail();
         this.player.clearAllEffects();
         this.enemy.clearAllEffects();
         const logData = logMessages.battle.system.death(persona.name);
         this._log(logData.message, logData.type);
-        this._log(`${finalText}`, "system");
+        this._log(final.message, final.type);
     }
     spawnFloatingText({name, target, value, type}){
         let color = "white";
@@ -300,22 +300,6 @@ class BattleManager extends Subscriber{
         const width = target.avatar.width || GRAPHICS_CONFIG.units.defaultSize;
         const baseX = target.avatar.x + width / 2;
         const baseY = target.avatar.y + width / 2 - offsetY;
-       /* const unitId = target.id;
-        const now = Date.now();
-        const STACK_WINDOW = 50; // Время в мс, в течение которого сообщения группируются
-        const LINE_HEIGHT = 100;   // Шаг смещения вверх (пиксели)
-        if(!this.floatingTextStorage[unitId]){
-            this.floatingTextStorage[unitId] = {lastTime: 0, currentOffset: 0}
-        }
-        const stack = this.floatingTextStorage[unitId];
-        if (now - stack.lastTime < STACK_WINDOW) {
-            // Если сообщения идут очередью -> поднимаем выше
-            stack.currentOffset += LINE_HEIGHT;
-        } else {
-            // Если была пауза -> сбрасываем позицию в начало
-            stack.currentOffset = 0;
-        }
-        stack.lastTime = now;*/
         const floatAnim = new FloatingText({
                 x: baseX,
                 y: baseY,

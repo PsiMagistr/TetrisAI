@@ -9,8 +9,8 @@ class spellExecutor {
             HEAL:(caster, target, power, context)=>{
                 caster.heal(power, context);
             },
-            DEFENCE:(caster, target, power)=>{
-                caster.removeRandomDebuff();
+            DEFENCE:(caster, target, power, context)=>{
+                caster.cleanseAllDebuffs(context.name);
             },
             EMPTY:(caster, target, power)=>{
 
