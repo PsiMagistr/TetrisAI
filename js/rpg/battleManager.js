@@ -228,6 +228,12 @@ class BattleManager extends Subscriber{
         this.enemy.takeDamage(1, context);
         if( this.player.stats.naturePower){
             this.player.spendMp(-5);
+            this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
+                target: this.player,
+                value: 5,
+                type: "MANA_RESTORE", // Нужно добавить этот тип в свитч
+                name: "Сила природы"
+            });
         }
         await this._enemyTurn();
     }
@@ -281,6 +287,10 @@ class BattleManager extends Subscriber{
         else if(type === "HEAL"){
             color = "green";
             text = `${name} (HP +${value})`;
+        }
+        else if(type === "MANA_RESTORE"){
+            color = "blue";
+            text = `${name} (MP +${value})`;
         }
         else if(type === "DEBUFFER"){
             color = "#CCCCCC";
