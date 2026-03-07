@@ -4,8 +4,8 @@
             name:"Вика",
             baseHp:100,
             currentHp:100,
-            baseMp:150,
-            currentMp:150,
+            baseMp:200,
+            currentMp:200,
             baseStats:{
                 atk:2,
                 def:0,

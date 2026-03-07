@@ -4,7 +4,7 @@ const MOB_SPELLS_DATABASE = {
         name:"Тяжелый удар",
         type:"ATTACK",
         baseCost:{MP:5},
-        basePower:10,
+        basePower:20,
         animationChain:[
             {
                 type:"jerk",
@@ -31,32 +31,34 @@ const MOB_SPELLS_DATABASE = {
                 isUseCallback:true,
             }
         ],
-        modifiers:{
-            J:{
-                enabled:false,
+        fixedEffect:{
+            name:"Кровотечение",
+            effectId: "BLEEDING",
+            target: "ENEMY",
+            type: "DEBUFF",
+            baseDuration: 2,
+            effectPower: 0.2,
+            iconIndex:3,
+            extension:false,
+        },
+    },
+    POWER_DARKNESS: {
+        id: "POWER_DARKNESS",
+        name: "Сила тьмы",
+        type: "HEAL",
+        icon: "./assets/spells/icons/healing.png",
+        baseCost: {MP: 5,},
+        basePower: 12,
+        animationChain: [
+            {
+                type: "overlayEffect",
+                startFrom: "caster",
+                duration: 1000,
+                size: 50,
+                color: "red",
+                callback: null,
+                isUseCallback: true,
             },
-            I:{
-                enabled:true,
-                levels:[0, 1, 2],
-                costs:[{MP:0},{MP:0},{MP:0}],
-                behavior:"cycle",
-            },
-            Z:{
-                enabled:true,
-                effectId: "BLEEDING",
-                name:"Кровотечение",
-                target: "ENEMY", // <--- Явно указываем цель
-                type: "DEBUFF",
-                cost:{Z:0},
-                baseDuration: 3,
-                effectPower: 0.2,
-                extension:false,
-                iconIndex:3,
-                behavior:"toggle",
-            },
-            S:{
-                enabled:false,
-            }
-        }
+        ],
     },
 }

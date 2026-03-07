@@ -74,7 +74,7 @@ class SpellBuilder {
     toggleModifier(key){
         const spellConfig = this._getSpellConfig(this.currentSpellId);
         if(!spellConfig) return this;
-        const modConfig = spellConfig.modifiers[key];
+        const modConfig = spellConfig.modifiers?.[key];
         if(!modConfig || !modConfig.enabled) return this;
         if(modConfig.behavior == "cycle"){
            this._cycleLevel(key, modConfig);
@@ -93,7 +93,7 @@ class SpellBuilder {
         }
     }
     _applyScale(draft){
-        if(draft.spellConfig.modifiers.J?.enabled){
+        if(draft.spellConfig.modifiers?.J?.enabled){
             const costObj = draft.spellConfig.modifiers.J.costs[draft.state.J];
             this._mergeCost(draft, costObj);
             draft.scaleMult = draft.spellConfig.modifiers.J.levels[draft.state.J];
@@ -115,7 +115,7 @@ class SpellBuilder {
            }
         }
         const effKey = draft.state.Z? "Z":(draft.state.S?"S":null);
-        if(effKey && draft.spellConfig.modifiers[effKey]?.enabled){
+        if(effKey && draft.spellConfig.modifiers?.[effKey]?.enabled){
             if(draft.spellConfig.modifiers.I?.enabled){
                 const costObj = draft.spellConfig.modifiers.I.costs[draft.state.I];
                 this._mergeCost(draft,costObj);
@@ -160,7 +160,7 @@ class SpellBuilder {
             totalCost: draft.totalCost,
             power: draft.finalPower,
             effect: draft.activeEffect,
-            modifiers:draft.spellConfig.modifiers,
+            modifiers:draft.spellConfig.modifiers || {},
             modifiersState:{...this.state},
             animationChain:draft.spellConfig.animationChain,
             isValid:draft.isValid,

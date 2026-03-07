@@ -36,7 +36,7 @@ const logMessages = {
                 type:"player-attack",
             }),
             heal:(targetName, spellName, actualHealed)=>({
-                message:`${targetName} применяет ${spellName} ${targetName} исцелен(а) на ${Math.round(actualHealed)} ед.`,
+                message:`${targetName} применяет ${spellName}. ${targetName} исцелен(а) на ${Math.round(actualHealed)} ед.`,
                 type:"heal",
             }),
             cleanseAllDebuffs:(targetName, spellName)=>({

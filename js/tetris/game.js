@@ -122,7 +122,7 @@ class Game extends Subscriber {
         this.isAnimating = true;
         this.stopLoop();
         await this.eventBus.emitAsync(EVENTS.ANIMATION.START, {
-            count: 30,
+            count: 10,
             time: 100,
             indexes: blinkedIndexes,
             matrix: this.grid.matrix
@@ -135,7 +135,6 @@ class Game extends Subscriber {
         const newLevelThreshold = Math.floor(this.lines / this.levelByLines);
         if(newLevelThreshold > previousLevelThreshold){
             this.level = newLevelThreshold + 1;
-            //console.log("Seledka " + this.level)
         }
         this.eventBus.emit(EVENTS.RENDER.FORCE, this.getRenderState()); //Надо или нет - проясним
         this.eventBus.emit(EVENTS.UI.UPDATE_STATS, this.uiState());

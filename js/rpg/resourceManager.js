@@ -40,7 +40,7 @@ class ResourceManager extends Subscriber{
                 value:0,
             },
         }
-        this.resourceRate = 10;
+        this.resourceRate = 100;
         this.eventOn(EVENTS.GAME.START, this.reset.bind(this));
         this.eventOn(EVENTS.RESOURCES.CALCULATE, this.handleCalculateResources.bind(this));
         this.eventOn(EVENTS.GAME.RESET, this.reset.bind(this));
