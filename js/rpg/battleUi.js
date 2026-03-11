@@ -118,12 +118,12 @@ class BattleUi extends BaseUi{
             // 2. ЦЕНА (Мини-бейдж)
             const costsWrapper = document.createElement("div");
             costsWrapper.className = "spell-btn-costs-wrapper";
-            /*for(const [key, val] of Object.entries(spell.baseCost)) {
+            for(const [key, val] of Object.entries(spell.baseCost)) {
                 const costBadge = document.createElement("span");
                 costBadge.className = `spell-btn-cost type-${key}`;
                 costBadge.textContent = `${key}:${val}`;
                 costsWrapper.appendChild(costBadge);
-            }*/
+            }
             if (costsWrapper.children.length > 0) {
                 btn.appendChild(costsWrapper);
             }
@@ -133,73 +133,129 @@ class BattleUi extends BaseUi{
         container.appendChild(fragment);
         this.ui.spellBtns = container.querySelectorAll(".spell-btn");
     }
-    updateSpellPreview(spellData){
-        if(!spellData) return;
-        const battle = this.ui;
-        console.log("*************");
-        const modifiers = spellData.modifiers;
-        const state = spellData.modifiersState;
-        console.log(state);
-        const changeModifier = (btn) =>{
-            const key = btn.dataset.mod;
-            const isActive =  Boolean(state[key]);
-            const bage = btn.querySelector("span");
-            btn.classList.toggle("active", isActive);
-            if(!bage) return
-            if(isActive){
-                bage.textContent = `+${state[key]}`;
-                bage.style.display = "block";
-            }
-            else{
-                bage.style.display = "none";
+
+    updateSpellPreview(spellData) {
+        if (!spellData) return;
+        const battle = this.ui; // Ссылка на элементы UI
+        const { modifiers, modifiersState: state } = spellData;
+        // 1. КЭШИРОВАНИЕ КНОПОК
+        const btnsMap = {};
+        if (battle.modBtns) {
+            for (const btn of battle.modBtns) {
+                btnsMap[btn.dataset.mod] = btn;
             }
         }
 
-        const btns = battle.modBtns;
-        const btnsObj = {};
-        for(const btn of btns){
-            btnsObj[btn.dataset.mod] = btn;
-            const mod = btn.dataset.mod;
-            const modConfig = modifiers[mod];
-            if(modConfig){
-                btnsObj[mod].disabled = !modifiers[mod].enabled
-                changeModifier(btnsObj[mod]);
-            }
-        }
-        const cost  = Object.entries(spellData.totalCost)
-            .map(([k,v])=>`${k}:${v}`).join(", ");
+        // 2. ОБНОВЛЕНИЕ КНОПОК МОДИФИКАТОРОВ
+        if (battle.modBtns) {
+            for (const btn of battle.modBtns) {
+                const key = btn.dataset.mod; // J, I, Z, S
+                const modConfig = modifiers[key];
+                const badge = btn.querySelector("span");
 
-        if(spellData.effect){
-            for(const key in battle.previewEffectsGrid){
-                battle.previewEffectsGrid[key].textContent = spellData.effect[key];
-            }
-        }
-        else{
-            for(const key in battle.previewEffectsGrid){
-                battle.previewEffectsGrid[key].textContent = "--";
-            }
-        }
-        battle.previewName.textContent = `${spellData.name}`;
-        battle.previewPower.textContent = `${spellData.power}`;
-        battle.totalCost.textContent = cost;
-        if (modifiers.I?.enabled && btnsObj.I){
-            const isEffectActive = state.S || state.Z;
-            btnsObj.I.disabled = !isEffectActive;
-            if (!isEffectActive) {
-                btnsObj.I.classList.remove("active");
-                const badge = btnsObj.I.querySelector(".badge");
+                // Сброс визуального состояния
+                btn.classList.remove("active");
                 if (badge) badge.style.display = "none";
+
+                // А. Проверка доступности в базе
+                if (!modConfig || !modConfig.enabled) {
+                    btn.disabled = true;
+                    //btn.classList.add("unavailable");
+                    continue;
+                }
+
+                // Если доступно
+                btn.disabled = false;
+                btn.classList.remove("unavailable");
+
+                // Б. Проверка состояния (State)
+                const val = state[key];
+
+                if (val) {
+                    btn.classList.add("active");
+
+                    if (badge) {
+                        badge.style.display = "block";
+                        if (key === 'J') {
+                            badge.textContent = `x${val}`;
+                        } else if (key === 'I') {
+                            const bonus = modConfig.levels ? modConfig.levels[val] : val;
+                            badge.textContent = `+${bonus}`;
+                        } else {
+                            badge.textContent = "ON";
+                        }
+                    }
+                }
             }
         }
-        for(const spellButton of this.ui.spellBtns){
-            if(spellButton.dataset.id === spellData.id){
-                spellButton.classList.add("selected");
-            }
-            else{
-                spellButton.classList.remove("selected");
+
+        // 3. ЛОГИКА БЛОКИРОВКИ "I" (Зависимость от эффекта)
+        if (modifiers.I?.enabled && btnsMap.I) {
+            const isEffectActive = state.S || state.Z;
+            btnsMap.I.disabled = !isEffectActive;
+
+            if (!isEffectActive) {
+                btnsMap.I.classList.remove("active");
+                const b = btnsMap.I.querySelector("span");
+                if (b) b.style.display = "none";
             }
         }
-        battle.castBtn.disabled = !spellData.isValid;
+
+        // 4. ТЕКСТЫ (Имя, Сила)
+        if (battle.previewName) battle.previewName.textContent = spellData.name;
+        if (battle.previewPower) battle.previewPower.textContent = spellData.power;
+
+        // 5. ЦЕНА (Простой текст)
+        if (battle.totalCost) {
+            // Формируем строку вида "T:5, MP:10"
+            const costStr = Object.entries(spellData.totalCost)
+                .map(([k, v]) => `${k}:${v}`)
+                .join(', '); // Разделитель запятая
+
+            battle.totalCost.textContent = costStr;
+        }
+
+        // 6. КАРТОЧКА ЭФФЕКТА
+        if (battle.previewEffectBlock) {
+            battle.previewEffectBlock.classList.remove("hidden");
+        }
+
+        if (spellData.effect) {
+            // Эффект есть -> Заполняем данными
+            for (const key in battle.previewEffectsGrid) {
+                const el = battle.previewEffectsGrid[key];
+                const val = spellData.effect[key];
+                if (el) el.textContent = (val !== undefined && val !== null) ? val : "--";
+            }
+            // Подписи типов
+            if (battle.previewEffectsGrid.type) {
+                battle.previewEffectsGrid.type.textContent = spellData.effect.type === 'BUFF' ? 'БАФФ' : 'ДЕБАФФ';
+            }
+            if (battle.previewEffectsGrid.target) {
+                battle.previewEffectsGrid.target.textContent = spellData.effect.target === 'SELF' ? 'НА СЕБЯ' : 'ВРАГ';
+            }
+        } else {
+            // Эффекта нет -> Заполняем прочерками
+            for (const key in battle.previewEffectsGrid) {
+                const el = battle.previewEffectsGrid[key];
+                if (el) el.textContent = "--";
+            }
+        }
+
+        // 7. СПИСОК ЗАКЛИНАНИЙ (Подсветка)
+        if (this.ui.spellBtns) {
+            this.ui.spellBtns.forEach(btn => {
+                const isSelected = btn.dataset.id === spellData.id;
+                btn.classList.toggle("selected", isSelected);
+            });
+        }
+
+        // 8. КНОПКА "ПРИМЕНИТЬ"
+        if (battle.castBtn) {
+            battle.castBtn.classList.remove("hidden");
+            battle.castBtn.disabled = !spellData.isValid;
+            battle.castBtn.textContent = spellData.isValid ? "ПРИМЕНИТЬ" : "НЕТ МАНЫ";
+        }
     }
     resetInterface(){
         const btnModifiers = document.querySelectorAll(".mod-btn");
