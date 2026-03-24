@@ -18,7 +18,7 @@ class EnemyAI{
             const aiBuilder = new SpellBuilder(null, this.caster);
             aiBuilder.setBaseSpell(spellId);
             const spell = aiBuilder.build();
-            if(!spell || spell.isValid){
+            if(!spell || !spell.isValid){
                 continue;
             }
             const utilityScore = this._calculateUtility(spell);
@@ -51,7 +51,7 @@ class EnemyAI{
         return score;
     }
     _evalHeal(spell){
-        const myHpPct = this.target.currentHp / this.target.maxHp;
+        const myHpPct = this.caster.currentHp / this.caster.maxHp;
         if (myHpPct > 0.8) return 0;
         let score = (1 - myHpPct) * 100;
         const missingHp = this.caster.maxHp - this.caster.currentHp;

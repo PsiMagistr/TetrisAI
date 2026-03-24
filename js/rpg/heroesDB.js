@@ -11,7 +11,7 @@
                 def:0,
                 speed:2,
                 immunityToDebuffs:false,
-                naturePower:false,
+                naturePower:0, //false
             },
             spriteKey:"MISTRESS",
             offset:{x:50,y:40},

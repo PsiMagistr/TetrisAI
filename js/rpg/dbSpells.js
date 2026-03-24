@@ -69,7 +69,7 @@ const SPELLS_DATABASE = {
         name:"Исцеление",
         type:"HEAL",
         icon:"./assets/spells/icons/healing.png",
-        baseCost: { O: 15, MP:30,},
+        baseCost: { O: 15, MP:10,},
         basePower: 12,
         animationChain:[
             {
@@ -94,8 +94,8 @@ const SPELLS_DATABASE = {
             },
             I:{
                 enabled:true,
-                levels:[0, 1, 2],
-                costs:[{I:0, MP:0},{I:10, MP:0},{I:30, MP:0}],
+                levels:[0, 1, 2, 3],
+                costs:[{I:0, MP:0},{I:10, MP:0},{I:30, MP:0}, {I:35, MP:0}],
                 behavior:"cycle",
             },
             S: {
@@ -148,14 +148,14 @@ const SPELLS_DATABASE = {
         name:"Сила природы",
         type:"EMPTY",
         baseCost:{T:5, MP:10, S:5}, // Основа
-        basePower:1,
+        basePower:30,
         icon:"./assets/spells/icons/nature_power.png",
         fixedEffect:{  //Эффект пакетного типа
             name:"Сила Природы",
             effectId: "NATURE_POWER",
             target: "SELF", // <--- Цель: Игрок
             type: "BUFF",
-            baseDuration: 3, // Висит 2 хода + бонусы от I
+            baseDuration: 5, // Висит 2 хода + бонусы от I
             effectPower: 0.5, // Лечит 50% от силы заклинания каждый ход
             iconIndex:7,
             extension:false,

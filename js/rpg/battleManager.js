@@ -184,7 +184,7 @@ class BattleManager extends Subscriber{
             this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:true});
             this.isPlayerTurn = true;
     }
-    async _enemyTurn(){
+    /*async _enemyTurn(){
         this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
         await delay(1000);
         const logData = logMessages.battle.system.enemyTurn();
@@ -217,6 +217,38 @@ class BattleManager extends Subscriber{
         );
         this.battleState.animations.push(animationContainer);
         this.isPlayerTurn = false;
+    }*/
+    async _enemyTurn(){
+        this.eventBus.emit(EVENTS.UI.SET_INTERFACE_INTERACTIVITY, {isActive:false});
+        await delay(1000);
+        let logData = logMessages.battle.system.enemyTurn();
+        this._log(logData.message, logData.type);
+        await this.enemy.tickActiveEffects();
+        if(this.player.isDead || this.enemy.isDead) return;
+        const spellList = this.enemy.spellList;
+        if (!spellList || spellList.length === 0) {
+            console.warn("У врага нет заклинаний! Пропуск хода.");
+            this._playerTurn();
+            return
+        }
+        const ai = new EnemyAI(this.enemy, this.player);
+        const enemySpell = ai.getBestAction();
+        if(enemySpell === null){
+            this._log(logData.message, logData.type);
+            this._playerTurn();
+            return;
+        }
+        const cost = {...enemySpell.totalCost};
+        const mp = cost.MP;
+        this.enemy.spendMp(mp);
+        const animationContainer = this.animationSpellFactory.createSpellAnimation(
+            this.enemy,       // Caster
+            this.player,      // Target
+            enemySpell.animationChain || [], // Цепочка из базы данных
+            this.onHit.bind(this, enemySpell, this.enemy, this.player) // Коллбэк
+        );
+        this.battleState.animations.push(animationContainer);
+        this.isPlayerTurn = false;
     }
     async handleBasicAttack(){//Топнуть ножкой.
         const context = {
@@ -225,8 +257,8 @@ class BattleManager extends Subscriber{
             caster:this.player,
         }
         this.enemy.takeDamage(1, context);
-        if( this.player.stats.naturePower){
-            this.player.spendMp(-5);
+        if(this.player.stats.naturePower > 0){
+            this.player.spendMp(-this.player.stats.naturePower);
             this.eventBus.emit(EVENTS.BATTLE.FLOATING_TEXT, {
                 target: this.player,
                 value: 5,

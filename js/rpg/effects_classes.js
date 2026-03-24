@@ -150,11 +150,11 @@ class NaturePowerEffect extends StatusEffect{
         super({id, name, type, sprite, target, power, duration, extension, iconIndex});
     }
     onApply() {
-        this.target.stats.naturePower = true;
+        this.target.stats.naturePower = this.power;
         super.onApply();
     }
     onRemove(isSlient = false) {
-        this.target.stats.naturePower = false;
+        this.target.stats.naturePower = 0;
         super.onRemove(isSlient);
     }
 }
